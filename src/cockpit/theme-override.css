@@ -1,0 +1,72 @@
+
+/* brute-force overrides inside cockpit only */
+.cockpit-scope [style*="#0f172a"], .cockpit-scope [style*="#0b1220"]{ background: var(--panel) !important; }
+.cockpit-scope [style*="#111827"], .cockpit-scope [style*="#101621"]{ background: var(--chip) !important; }
+.cockpit-scope [style*="#1f2937"], .cockpit-scope [style*="#374151"]{ border-color: var(--border) !important; stroke: var(--border) !important; }
+.cockpit-scope [style*="#93c5fd"], .cockpit-scope [style*="#2563eb"]{ color: var(--accent-teal) !important; stroke: var(--accent-teal) !important; background: var(--accent-teal) !important; }
+/* scoped SMF palette – wins over any global vars */
+.cockpit-scope{
+  --bg:#0e1014;
+  --panel:#121821;
+  --chip:#101621;
+  --border:#263043;
+  --ink:#E6F1FF;
+  --accent-teal:#00F6FF;
+  --accent-pink:#FF2BD6;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Scope: cockpit embed + ConditionsPills only */
+.cockpit-embedded .pills { display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 10px }
+
+/* Base pill */
+.cockpit-embedded .pills .pill{
+  position:relative; max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  padding:6px 12px; border:1px solid var(--border); border-radius:14px;
+  font:600 12px/1.2 ui-sans-serif,system-ui; letter-spacing:.2px;
+  background:#0a0f18; color:var(--text);
+  box-shadow:0 0 0 1px rgba(0,255,255,.05) inset, 0 6px 18px rgba(0,0,0,.25);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease, background .12s ease;
+}
+.cockpit-embedded .pills .pill:hover{ transform:translateY(-1px) }
+
+/* HUD container */
+.cockpit-embedded .pills.hud{ position:relative; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background:#050709; overflow:hidden }
+.cockpit-embedded .pills.hud::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.18;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 16px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 16px);
+}
+
+/* Inner glass */
+.cockpit-embedded .pills .pill::after{
+  content:""; position:absolute; left:0; right:0; top:0; height:36%;
+  border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0));
+  mix-blend-mode:screen; opacity:.6;
+}
+
+/* Severity */
+.cockpit-embedded .pills .pill:not(.warn):not(.bad){
+  color:#8BE9FF;
+  box-shadow:
+    0 0 0 1px rgba(0,255,255,.18) inset,
+    0 6px 18px rgba(0,0,0,.25),
+    0 0 12px rgba(0,255,255,.18);
+}
+.cockpit-embedded .pills .pill.warn{
+  border-color:#E5C84A; background:#1b1502; color:#ffeaa6;
+  box-shadow:0 0 0 1px rgba(229,200,74,.18) inset,0 8px 20px rgba(229,200,74,.08),0 0 14px rgba(229,200,74,.18);
+  animation:hud-pulse .45s ease-in-out infinite alternate;
+}
+.cockpit-embedded .pills .pill.bad{
+  border-color:#FF5A6B; background:#1a0609; color:#ffc7cf;
+  box-shadow:0 0 0 1px rgba(255,90,107,.20) inset,0 10px 22px rgba(255,90,107,.10),0 0 16px rgba(255,90,107,.20);
+  animation:hud-pulse-crit .35s ease-in-out infinite alternate;
+}
+
+/* Subtle annunciator pulse */
+@keyframes hud-pulse{from{filter:brightness(1)}to{filter:brightness(1.08) drop-shadow(0 0 6px rgba(229,200,74,.18))}}
+@keyframes hud-pulse-crit{from{filter:brightness(1)}to{filter:brightness(1.12) drop-shadow(0 0 8px rgba(255,90,107,.25))}}

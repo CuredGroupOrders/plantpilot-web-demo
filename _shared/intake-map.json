@@ -1,0 +1,48 @@
+{
+  "stage": "Stage",
+  "lightcycle": "Lightcycle",
+  "photoperiodHours": "Photoperiod (h)",
+  "media": "Media",
+  "containerGal": "Container_gal",
+  "mode": "Mode",
+  "cycle": "Cycle",
+  "co2Mode": "CO2 mode",
+
+  "tLeaf": "Canopy temp (°C)",
+  "canopyTempC": "Canopy temp (°C)",
+
+  "rh": "RH (%)",
+  "vpd": "VPD (kPa)",
+  "ppfd": "PPFD (µmol/m²/s)",
+  "dli": "DLI (mol/m²/d)",
+  "co2": "CO2 (ppm)",
+
+  "runoffPh": "Runoff pH",
+  "bulkEc": "Bulk EC (mS/cm)",
+  "pwecRunoffEc": "PWEC / Runoff EC (mS/cm)",
+  "runoffPct": "Runoff %",
+  "vwc": "VWC (%)",
+  "irrigLast24": "Irrigations in last 24h",
+  "vwcAtLast": "VWC% at last irrigation",
+
+  "overnightDrybackPct": "Overnight dryback % target",
+  "firstEventTarget": "Target at first event",
+
+  "p1Events": "P1 events",
+  "p1IntervalMin": "P1 interval (min)",
+  "p1Pct": "P1 %",
+  "mlPerP1": "ml per P1 event",
+  "secsPerP1": "Seconds per P1 event",
+
+  "p2Events": "P2 events",
+  "p2IntervalMin": "P2 interval (min)",
+  "p2Pct": "P2 %",
+  "mlPerP2": "ml per P2 event",
+  "secsPerP2": "Seconds per P2 event",
+
+  "runoffEc": "Runoff EC (mS/cm)",
+  "reservoirEc": "Reservoir EC (mS/cm)",
+  "reservoirPh": "Reservoir pH",
+  "reservoirTemp": "Reservoir temp (°C)",
+  "pwec": "PWEC (mS/cm)"
+}

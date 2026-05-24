@@ -1,0 +1,54 @@
+{
+  "features": {
+    "symptoms": [
+      "Uniform chlorosis",
+      "Interveinal chlorosis",
+      "Leaf tip burn",
+      "Leaf curl",
+      "Necrotic margins",
+      "Stunted growth"
+    ]
+  },
+  "scoring": {
+    "gate_multipliers": { "ENV": 1.3, "ROOT": 1.0, "IRR": 1.2 },
+    "top_k": 3,
+    "likely_threshold": 0.66,
+    "possible_threshold": 0.33,
+    "min_matches_for_likely": 2,
+    "hide_below": 0.2
+  },
+  "gate_map": {
+    "Uniform chlorosis": "IRR",
+    "Interveinal chlorosis": "IRR",
+    "Leaf tip burn": "IRR",
+    "Leaf curl": "ENV",
+    "Necrotic margins": "IRR",
+    "Stunted growth": "ROOT"
+  },
+  "item_weights": {
+    "Interveinal chlorosis": 1.2,
+    "Leaf tip burn": 1.1
+  },
+  "diagnoses": [
+    {
+      "diagnosis": "Magnesium deficiency",
+      "triggers": ["Interveinal chlorosis", "Uniform chlorosis", "DLI high", "VPD high"]
+    },
+    {
+      "diagnosis": "Salt accumulation / over-fertilization",
+      "triggers": ["Leaf tip burn", "�Z�?�EC accumulation high", "Dryback low", "pH low"]
+    },
+    {
+      "diagnosis": "Under-feeding / depletion",
+      "triggers": ["Uniform chlorosis", "�Z�?�EC depletion high", "Dryback high"]
+    },
+    {
+      "diagnosis": "Heat / evaporative stress",
+      "triggers": ["Leaf curl", "VPD high", "Root temp high", "DLI high"]
+    },
+    {
+      "diagnosis": "pH imbalance",
+      "triggers": ["pH high", "pH low", "Uniform chlorosis", "Leaf tip burn"]
+    }
+  ]
+}

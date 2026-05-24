@@ -1,0 +1,206 @@
+/* ============================
+   theme-vars.css — Full drop-in
+   ============================ */
+
+:root{
+  --bg:#000000;
+  --panel:#05090b7c;           /* gunmetal/transparent panel */
+  --chip:#000000;
+  --border:#00f7db;            /* cyan outline */
+  --ink:#00f7db;               /* default text tone */
+
+  /* Severity palette */
+  --cy:#00f7db;   /* OK    (neon cyan)   */
+  --yl:#ffa600;   /* WARN  (neon yellow) */
+  --am:#ff5e00;   /* BAD   (neon amber)  */
+  --rd:#ff2e2e;   /* optional CRIT       */
+
+  /* Pill sizing */
+  --chip-w:220px;
+  --chip-fs:14px;
+  --chip-lh:1.15;
+  --chip-py:10px;
+}
+
+/* ========== Base background + panels ========== */
+body{ background:var(--bg); color:var(--ink); }
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+}
+
+/* ========== Neon Flag Chips ========== */
+.flags,.chips,.flag-list{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; isolation:isolate;
+}
+
+/* Capsule layout */
+.chip{
+  flex:0 0 var(--chip-w); width:var(--chip-w);
+  min-height:calc(var(--chip-fs)*var(--chip-lh)*3 + var(--chip-py)*2);
+  max-height:calc(var(--chip-fs)*var(--chip-lh)*3 + var(--chip-py)*2);
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  padding:var(--chip-py) 18px;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-weight:800; font-size:var(--chip-fs); line-height:var(--chip-lh); letter-spacing:.02em;
+  background:transparent; border:none; border-radius:999px; color:var(--ink);
+  overflow:hidden; text-overflow:ellipsis; white-space:normal;
+}
+.chip-label{
+  display:-webkit-box; -webkit-box-orient:vertical;
+  -webkit-line-clamp:3; line-clamp:3;
+  overflow:hidden; text-overflow:ellipsis; white-space:normal; width:100%;
+}
+
+/* OK — cyan */
+.chip-ok{
+  color:var(--cy);
+  box-shadow:
+    inset 0 0 0 2px var(--cy),
+    inset 0 0 26px rgba(0,247,219,.62),
+    0 0 30px rgba(0,247,219,.52),
+    0 0 60px rgba(0,247,219,.40);
+}
+
+/* WARN — neon yellow */
+.chip-warn{
+  color:var(--yl);
+  box-shadow:
+    inset 0 0 0 2px var(--yl),
+    inset 0 0 26px rgba(255,224,0,.70),
+    0 0 30px rgba(255,224,0,.58),
+    0 0 60px rgba(255,224,0,.46);
+}
+
+/* BAD — neon amber (dark orange) */
+.chip-bad{
+  color:var(--am);
+  box-shadow:
+    inset 0 0 0 2px var(--am),
+    inset 0 0 26px color-mix(in srgb,var(--am)78%,transparent),
+    0 0 30px color-mix(in srgb,var(--am)66%,transparent),
+    0 0 60px color-mix(in srgb,var(--am)54%,transparent);
+}
+
+/* Optional critical red */
+.chip-crit{
+  color:var(--rd);
+  box-shadow:
+    inset 0 0 0 2px var(--rd),
+    inset 0 0 26px rgba(255,59,92,.78),
+    0 0 30px rgba(255,59,92,.66),
+    0 0 60px rgba(255,59,92,.54);
+}
+
+/* Neutralize legacy wrappers */
+.cockpit-embedded .chip,
+.cockpit-embedded .chip-ok,
+.cockpit-embedded .chip-warn,
+.cockpit-embedded .chip-bad{
+  background:transparent !important; border:none !important; mix-blend-mode:normal !important;
+}
+
+/* Mobile */
+@media(max-width:640px){
+  :root{ --chip-w:100% }
+  .chip{ border-radius:14px }
+}
+
+/* ========== Cockpit Odometer Visuals ========== */
+
+/* Center the odometers and squeeze ~12% closer */
+.odo-grid{
+  display:grid !important;
+  grid-template-columns: repeat(3, 280px);   /* equal column width */
+  column-gap: 35px;                           /* was 80 → ~12% tighter */
+  row-gap: 32px;
+  justify-content: center;                    /* center the trio in the card */
+  align-items: start;
+  max-width: calc(3*280px + 2*70px);         /* 840 + 140 = 980px */
+  margin: 0 auto;                             /* center container */
+  padding: 20px 0 8px;                        /* space below header line */
+}
+
+/* Responsive tightening */
+@media (max-width: 1100px){
+  .odo-grid{ column-gap:56px; max-width: calc(3*280px + 2*56px) }
+}
+@media (max-width: 900px){
+  .odo-grid{ column-gap:35px; max-width: calc(3*280px + 2*35px) }
+}
+@media (max-width: 720px){
+  .odo-grid{
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 24px;
+    max-width: 90vw;
+  }
+}
+
+/* ensure the odometer card doesn't clip centered grid */
+.odo-card, .odo-card .card-body{ overflow:visible !important; }
+
+/* per-odometer block */
+.cockpit-odo{
+  display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin:0;
+}
+
+/* Circular gauge */
+.cockpit-gauge{ position:relative; width:144px; height:144px }
+
+/* arc + bloom (component may override color inline) */
+.cockpit-gauge .gauge-ring{
+  position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(var(--cy) 0deg, rgba(255,255,255,.06) 0);
+  -webkit-mask:radial-gradient(circle at 50% 50%, transparent 58px, #000 59px);
+          mask:radial-gradient(circle at 50% 50%, transparent 58px, #000 59px);
+  box-shadow:0 0 30px rgba(0,247,219,.48), 0 0 60px rgba(0,247,219,.42), 0 0 90px rgba(0,247,219,.30);
+}
+.cockpit-gauge::after{
+  content:""; position:absolute; inset:8px; border-radius:50%;
+  background:conic-gradient(from -90deg, rgba(255,255,255,.16) 0 2deg, transparent 2deg 30deg);
+  -webkit-mask:radial-gradient(circle at 50% 50%, transparent 56px, #000 57px);
+          mask:radial-gradient(circle at 50% 50%, transparent 56px, #000 57px);
+  mix-blend-mode:screen; opacity:.5; pointer-events:none;
+}
+.cockpit-gauge .gauge-core{
+  position:absolute; inset:8px; border-radius:999px;
+  background:#060a0c; border:1px solid #0a1e21;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.6), 0 0 18px rgba(0,247,219,.25);
+}
+
+/* numerals */
+.cockpit-gauge .gauge-val{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:Audiowide,Orbitron,system-ui; font-weight:800; font-size:63px;
+  text-shadow:0 0 18px rgba(0,247,219,.34), 0 0 36px rgba(0,247,219,.26);
+  color:var(--cy);
+}
+.gauge .gauge-val{ font-size:63px !important }
+.gauge .gauge-val span{ font-size:inherit !important; line-height:1 }
+
+/* Meta labels/subtext — centered, consistent width */
+.cockpit-odo .odo-title,
+.cockpit-odo .odo-sub{
+  display:block;
+  width:100%;
+  max-width:280px;           /* same as column width */
+  margin:0 auto;
+  text-align:center;         /* center both lines */
+}
+.cockpit-odo .odo-title{
+  font-family:Audiowide,Orbitron,system-ui; font-weight:700; font-size:12px;
+  letter-spacing:.16em; color:var(--cy); text-transform:uppercase;
+}
+.cockpit-odo .odo-sub{
+  line-height:1.25; color:var(--ink); opacity:.8; font-size:13px;
+}
+
+/* Per-gate hue helpers */
+.ic-cyan{ color:var(--cy) }
+.ic-amber{ color:var(--am) }
+.ic-yellow{ color:var(--yl) }
+
+/* ========== END theme-vars.css ========== */

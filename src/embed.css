@@ -1,0 +1,170 @@
+/* ============================
+   cockpit-embed.css — Mock-matched CRT skin
+   ============================ */
+
+/* Scoped tokens for the cockpit embed */
+.cockpit-embedded{
+  --crt-bg:    #081216;          /* deep teal */
+  --crt-elev:  #0b171b;          /* card base */
+  --crt-panel: #0a1216;          /* inner surfaces */
+  --crt-border:#0a1e21;          /* outer stroke */
+  --crt-inner:#0c2f31;           /* inner bezel stroke */
+  --crt-cyan:  #00f7db;          /* primary neon */
+  --crt-text:  #cfeff0;          /* text */
+  --crt-muted: #80b4b8;          /* muted text */
+}
+
+/* Base */
+.cockpit-embedded,
+.cockpit-embedded body{
+  background: radial-gradient(1200px 800px at 16% 20%, rgba(0,247,219,.08), transparent 40%),
+              radial-gradient(1200px 800px at 84% 28%, rgba(0,247,219,.05), transparent 45%),
+              var(--crt-bg) !important;
+  color: var(--crt-text) !important;
+}
+
+/* Global CRT grid overlay */
+.cockpit-embedded::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .14;
+  background-image:
+    linear-gradient(to right, rgba(0,247,219,.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,247,219,.08) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px;
+  z-index: 0;
+}
+
+/* Layout wrappers neutral */
+.cockpit-embedded .container,
+.cockpit-embedded .page,
+.cockpit-embedded main{
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+}
+
+/* === Card/Panel CRT bezel === */
+.cockpit-embedded .card,
+.cockpit-embedded .panel,
+.cockpit-embedded .box,
+.cockpit-embedded .dialog{
+  position: relative;
+  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.36)), var(--crt-elev) !important;
+  border:1px solid var(--crt-border) !important;
+  border-radius: 18px !important;
+  box-shadow: inset 0 0 24px rgba(0,255,220,.06) !important;
+  z-index: 1;
+}
+/* inner bezel */
+.cockpit-embedded .card::before,
+.cockpit-embedded .panel::before,
+.cockpit-embedded .box::before,
+.cockpit-embedded .dialog::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:1px solid var(--crt-inner);
+  border-radius:12px;
+  pointer-events:none;
+}
+/* panel grid */
+.cockpit-embedded .card::after,
+.cockpit-embedded .panel::after,
+.cockpit-embedded .box::after,
+.cockpit-embedded .dialog::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  opacity:.45;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,247,219,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,247,219,.06) 1px, transparent 1px);
+  background-size:26px 26px,26px 26px;
+  mask:linear-gradient(#000 calc(100% - 1px), transparent 0);
+}
+
+/* Buttons / inputs */
+.cockpit-embedded .btn,
+.cockpit-embedded button,
+.cockpit-embedded input,
+.cockpit-embedded select,
+.cockpit-embedded textarea{
+  background: var(--crt-panel) !important;
+  color: var(--crt-text) !important;
+  border: 1px solid var(--crt-border) !important;
+  border-radius: 12px !important;
+}
+/* hover/focus neon */
+.cockpit-embedded .btn:hover,
+.cockpit-embedded button:hover{
+  border-color: var(--crt-cyan) !important;
+  box-shadow: 0 0 0 1px var(--crt-cyan) inset,
+              0 0 14px rgba(0,247,219,.35) !important;
+}
+.cockpit-embedded input:focus,
+.cockpit-embedded select:focus,
+.cockpit-embedded textarea:focus{
+  outline: none !important;
+  border-color: var(--crt-cyan) !important;
+  box-shadow: 0 0 0 1px var(--crt-cyan) inset,
+              0 0 18px rgba(0,247,219,.28) !important;
+}
+
+/* Gauges: subtle cyan rim */
+.cockpit-embedded .gauge .score{
+  text-shadow: 0 0 8px rgba(0,247,219,.25) !important;
+}
+
+/* Headings and small labels in cyan */
+.cockpit-embedded h1,
+.cockpit-embedded h2,
+.cockpit-embedded h3,
+.cockpit-embedded .section-label{
+  color: var(--crt-cyan) !important;
+}
+
+/* Muted body text */
+.cockpit-embedded .muted,
+.cockpit-embedded .hint,
+.cockpit-embedded small,
+.cockpit-embedded pre{
+  color: var(--crt-muted) !important;
+}
+
+/* ===== Minimal coercion for inline “slate” rgb styles (from older tiles) ===== */
+.cockpit-embedded [style*="rgb(15, 23, 42)"], /* #0f172a */
+.cockpit-embedded [style*="#0f172a"]{
+  background: var(--crt-elev) !important;
+  border: 1px solid var(--crt-border) !important;
+  border-radius: 16px !important;
+}
+.cockpit-embedded [style*="rgb(17, 24, 39)"], /* #111827 */
+.cockpit-embedded [style*="#111827"]{
+  background: var(--crt-panel) !important;
+  color: var(--crt-text) !important;
+  border: 1px solid var(--crt-border) !important;
+  border-radius: 12px !important;
+}
+.cockpit-embedded [style*="1px solid rgb(31, 41, 55)"],
+.cockpit-embedded [style*="#1f2937"],
+.cockpit-embedded [style*="border-bottom: 1px solid rgb(31, 41, 55)"]{
+  border-color: var(--crt-border) !important;
+}
+
+/* Buttons with generic class hooks */
+.cockpit-embedded button,
+.cockpit-embedded [class*="btn"]{
+  background: var(--crt-panel) !important;
+  color: var(--crt-text) !important;
+  border: 1px solid var(--crt-border) !important;
+  border-radius: 12px !important;
+}
+
+/* EOF */

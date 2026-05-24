@@ -1,0 +1,72 @@
+:root{
+  --bg:#000;
+  --panel:#000;
+  --border:#00f7db;
+  --txt:#cfeff0;
+  --mut:#8aa7aa;
+  --ring:var(--border);
+  --shadow:none;
+  --r:16px;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  color:var(--txt);
+  background:var(--bg);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+
+/* Layout */
+.chrome-main{max-width:1150px;margin:0 auto;padding:24px;display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:1200px){.chrome-main{grid-template-columns: 1.2fr .9fr}}
+.col{display:flex;flex-direction:column;gap:16px}
+
+/* Cards (no CRT here; cockpit override adds it) */
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.card-sub{text-transform:uppercase;font-size:12px;letter-spacing:.14em;color:var(--txt)}
+.card-ttl{margin:2px 0 0;font-size:18px}
+.card-body{padding:16px}
+
+/* Pills */
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--txt);background:transparent}
+.pill.ok{color:#00ffc6;border-color:#00ffc6;box-shadow:0 0 16px rgba(0,255,198,.35) inset,0 0 24px rgba(0,255,198,.25)}
+.pill.warn{color:#ff8a00;border-color:#ff8a00;box-shadow:0 0 16px rgba(255,138,0,.40) inset,0 0 24px rgba(255,138,0,.30)}
+.pill.bad{color:#ff4d4d;border-color:#ff4d4d;box-shadow:0 0 16px rgba(255,59,92,.40) inset,0 0 24px rgba(255,59,92,.30)}
+
+/* Odometers */
+.odo-grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:640px){.odo-grid{grid-template-columns:repeat(3,1fr)}}
+.odo{display:flex;gap:16px;align-items:center}
+.gauge{position:relative;width:96px;height:96px}
+.gauge-ring{position:absolute;inset:0;border-radius:999px}
+.gauge-core{position:absolute;inset:8px;border-radius:999px;background:#0b0b0f;border:1px solid var(--border)}
+.gauge-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:600;color:var(--txt)}
+.gauge-val span{font-size:22px}
+.gauge-lbl{position:absolute;bottom:10px;width:100%;text-align:center;font-size:10px;opacity:.7}
+.odo-title{display:flex;align-items:center;gap:8px;font-weight:600}
+.odo-sub{font-size:12px;opacity:.75;margin-top:4px}
+
+/* Misc */
+.mini-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+@media(min-width:720px){.mini-grid{grid-template-columns:repeat(3,1fr)}}
+.mini{display:flex;gap:8px;align-items:center;opacity:.9}
+.switch{display:inline-flex;gap:8px;align-items:center;font-size:14px}
+.proof-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:760px){.proof-grid{grid-template-columns:repeat(3,1fr)}}
+.proof-key{color:var(--txt)} .proof-val{opacity:.9} .proof-note{font-size:12px;color:var(--mut)}
+.todo .callout{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent}
+.bullets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.btn-row{display:flex;gap:10px}
+.lever-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lever{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent}
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qa{display:block;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent}
+.chrome-ftr{border-top:1px solid var(--border);padding:16px 20px;font-size:12px;opacity:.6;display:flex;justify-content:space-between}

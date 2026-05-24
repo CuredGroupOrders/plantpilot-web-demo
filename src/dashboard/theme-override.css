@@ -1,0 +1,69 @@
+/* Cockpit theme override — load AFTER smf-benchmark.css and theme-vars.css */
+
+.cockpit-embedded,
+.cockpit-embedded body{
+  /* hard tokens for cockpit */
+  --bg:##1f1b19;
+  --panel:#000;
+  --chip:#000;
+  --border:#00f7db;
+  --ring:#00f7db;      /* fallback for any legacy use */
+  --txt:#cfeff0;
+  --ink:#00f7db;
+
+  background:#000 !important;
+  color:var(--txt) !important;
+}
+
+/* Black CRT cards with cyan outline and grid */
+.cockpit-embedded .card,
+.cockpit-embedded .panel,
+.cockpit-embedded .box,
+.cockpit-embedded .dialog{
+  position:relative;
+  background:#000 !important;
+  border:1px solid var(--border) !important;
+  border-radius:16px !important;
+  box-shadow:
+    0 0 0 1px rgba(0,247,219,.25) inset,
+    0 0 24px rgba(0,247,219,.12);
+  overflow:hidden;
+  backdrop-filter:none; /* kill any slate cast */
+}
+.cockpit-embedded .card::before,
+.cockpit-embedded .panel::before,
+.cockpit-embedded .box::before,
+.cockpit-embedded .dialog::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-image:
+    linear-gradient(rgba(0,247,219,.50) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,247,219,.50) 1px, transparent 1px);
+  background-size:26px 26px;
+  opacity:.50;            /* grid brightness */
+  pointer-events:none;
+  z-index:0;              /* sits under content */
+}
+/* content above grid */
+.cockpit-embedded .card > *,
+.cockpit-embedded .panel > *,
+.cockpit-embedded .box > *,
+.cockpit-embedded .dialog > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Nuke inline slate backgrounds/borders that sneak in */
+.cockpit-embedded [style*="#121821"],
+.cockpit-embedded [style*="rgb(18, 24, 33)"],
+.cockpit-embedded [style*="background: rgb(15, 23, 42)"],
+.cockpit-embedded [style*="#0f172a"]{
+  background:#000 !important;
+  border-color:var(--border) !important;
+}
+.cockpit-embedded [style*="1px solid rgb(31, 41, 55)"],
+.cockpit-embedded [style*="#1f2937"]{
+  border-color:var(--border) !important;
+}

@@ -1,0 +1,268 @@
+/* =========================
+   Global base + HUD skin
+   ========================= */
+
+/* Reset */
+*{ box-sizing:border-box }
+html,body,#root{ height:100%; margin:0 }
+body{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif }
+
+/* Neutral base */
+:root{
+  --bg:#0a0e12;
+  --text:#dfe9ea;
+  --muted:#8aa7aa;
+  --border:#13252a;
+  --card:#0f171b;
+  --accent:#1ee6d6;
+}
+body{ background:var(--bg); color:var(--text) }
+
+/* Layout primitives */
+.container{ max-width:960px; margin:0 auto; padding:16px }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px }
+.row{ display:grid; grid-template-columns:1fr; gap:12px }
+@media(min-width:720px){ .row-2{grid-template-columns:1fr 1fr} .row-3{grid-template-columns:1fr 1fr 1fr} }
+h1,h2,h3{ margin:0 0 8px }
+label{ display:block; font-size:14px; color:var(--muted); margin-bottom:4px }
+input,select{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0b1316; color:var(--text) }
+input:focus,select:focus{ outline:2px solid var(--accent); border-color:transparent }
+
+/* Buttons */
+.btn{ cursor:pointer; border:1px solid var(--border); background:#122026; color:#fff; padding:10px 14px; border-radius:10px }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#042426 }
+.btn.ghost{ background:transparent }
+.btn:disabled{ opacity:.5; cursor:not-allowed }
+
+/* Badges */
+.badge{ font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border) }
+.badge.ok{   color:#37ff7a; background:color-mix(in oklab,#37ff7a 18%,transparent); border-color:color-mix(in oklab,#37ff7a 40%,transparent) }
+.badge.warn{ color:#ffb627; background:color-mix(in oklab,#ffb627 18%,transparent); border-color:color-mix(in oklab,#ffb627 40%,transparent) }
+.badge.bad{  color:#ff4d4d; background:color-mix(in oklab,#ff4d4d 18%,transparent); border-color:color-mix(in oklab,#ff4d4d 40%,transparent) }
+
+/* Dialog */
+.dialog-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:flex-end; justify-content:center; padding:16px }
+.dialog{ width:100%; max-width:720px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; max-height:85vh; overflow:auto }
+.hr{ height:1px; background:var(--border); margin:12px 0 }
+.kv{ display:flex; justify-content:space-between; font-size:14px }
+
+/* Bottom tabbar */
+.container{ padding-bottom:80px }
+.tabbar{
+  position:fixed; left:0; right:0; bottom:0;
+  display:flex; gap:8px; justify-content:space-around;
+  padding:10px 12px; background:var(--card); border-top:1px solid var(--border);
+  backdrop-filter:blur(6px)
+}
+.tabbar button{ flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#122026; color:#fff; cursor:pointer }
+.tabbar button.active{ outline:2px solid var(--accent); border-color:transparent }
+
+/* =========================
+   HUD skin (scoped)
+   ========================= */
+.hud-skin-neo{
+  --neo-bg:#081216; --neo-text:#cfeff0; --neo-dim:#80b4b8;
+  --neo-cyan:#1ee6d6; --neo-green:#37ff7a; --neo-amber:#ffb627; --neo-red:#ff4d4d;
+  --neo-grid:rgba(30,230,214,.10);
+  --accent:#1ee6d6;
+  color:var(--neo-text);
+}
+
+/* HUD bezel */
+.hud-skin-neo .hud-bezel{
+  max-width:760px; margin:0 auto; position:relative; background:var(--neo-bg); border-radius:18px;
+  box-shadow:0 0 0 1px rgba(30,230,214,.15) inset, 0 0 24px rgba(0,255,220,.06)
+}
+.hud-skin-neo .hud-bezel::before{
+  content:""; position:absolute; inset:6px; border-radius:14px;
+  box-shadow:0 0 0 1px rgba(30,230,214,.18) inset, 0 0 0 2px rgba(0,0,0,.7) inset; pointer-events:none
+}
+
+/* Sticky HUD header */
+.hud-skin-neo .hud-header{
+  position:sticky; top:env(safe-area-inset-top,0); z-index:50;
+  background: radial-gradient(120% 60% at 50% -10%, rgba(30,230,214,.10), transparent),
+             linear-gradient(180deg,#061015,#081216);
+  box-shadow:0 1px 0 rgba(30,230,214,.22) inset;
+  margin:0 0 8px 0; padding-top:env(safe-area-inset-top,0)
+}
+.hud-skin-neo .hud-title{
+  margin:0; font-weight:800; font-size:18px; letter-spacing:.16em;
+  color:var(--neo-cyan); text-transform:uppercase; filter:drop-shadow(0 0 6px rgba(30,230,214,.5))
+}
+.hud-skin-neo .system-pill{
+  padding:8px 14px; border-radius:18px; border:1px solid currentColor;
+  text-transform:uppercase; font-weight:700; letter-spacing:.08em
+}
+.hud-skin-neo .system-pill.sev-good{ color:var(--neo-green) }
+.hud-skin-neo .system-pill.sev-warn{ color:var(--neo-amber) }
+.hud-skin-neo .system-pill.sev-bad{  color:var(--neo-red) }
+
+/* CRT panel card */
+.hud-skin-neo .card,
+.hud-skin-neo .crt{
+  position:relative; border:1px solid color-mix(in oklab,var(--neo-cyan)25%,transparent);
+  border-radius:12px; background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.36));
+  box-shadow:0 0 0 1px rgba(0,0,0,.7) inset, 0 0 24px rgba(0,255,220,.06) inset
+}
+.hud-skin-neo .card::before,
+.hud-skin-neo .crt::before{
+  content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none;
+  background-image:linear-gradient(var(--neo-grid) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--neo-grid) 1px,transparent 1px);
+  background-size:26px 26px; opacity:.6
+}
+
+/* HUD pill severity (matches smf-benchmark.css) */
+.hud-skin-neo .pill,
+.hud-skin-neo .pill.stat{
+  display:inline-block; padding:4px 8px; border-radius:999px;
+  border:1px solid var(--border); font-size:12px; color:var(--text); background:transparent
+}
+.hud-skin-neo .pill.ok,.hud-skin-neo .pill.stat.ok{
+  color:#00ffc6; border-color:#00ffc6;
+  box-shadow:0 0 16px rgba(0,255,198,.35) inset, 0 0 24px rgba(0,255,198,.25)
+}
+.hud-skin-neo .pill.warn,.hud-skin-neo .pill.stat.warn{
+  color:#ff8a00; border-color:#ff8a00;
+  box-shadow:0 0 16px rgba(255,138,0,.40) inset, 0 0 24px rgba(255,138,0,.30)
+}
+.hud-skin-neo .pill.bad,.hud-skin-neo .pill.stat.bad{
+  color:#ff4d4d; border-color:#ff4d4d;
+  box-shadow:0 0 16px rgba(255,59,92,.40) inset, 0 0 24px rgba(255,59,92,.30)
+}
+
+/* CRT grid overlay behind everything */
+html{ position:relative; z-index:0 }
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; opacity:.50;
+  background:
+    radial-gradient(1200px 800px at 20% 20%, rgba(0,247,219,.12), transparent 40%),
+    radial-gradient(1200px 800px at 80% 30%, rgba(255,178,0,.09), transparent 45%),
+    linear-gradient(to right, rgba(0,247,219,.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,247,219,.12) 1px, transparent 1px),
+    var(--bg);
+  background-size:40px 40px,40px 40px,40px 40px,40px 40px,auto
+}
+
+/* === Sticky Brand Bar (PlantPilot) === */
+#brand-bar{
+  position:sticky; top:0; z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(5,9,11,.92); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border,#00f7db);
+  padding:10px 16px
+}
+#brand-bar .brand-link{ display:flex; align-items:center; gap:12px; text-decoration:none }
+#brand-bar .brand-logo{ width:150px; height:150px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(0,247,219,.45)) }
+#brand-bar .brand-text{ display:flex; flex-direction:column; line-height:1.1 }
+#brand-bar .brand-name{ font-family:Audiowide,Orbitron,system-ui; font-size:20px; font-weight:800; letter-spacing:.14em; color:var(--accent,#1ee6d6) }
+#brand-bar .brand-sub{  font-family:Inter,system-ui; font-size:17px; color:var(--accent,#1ee6d6); opacity:.8 }
+
+/* Hide brand bar when running inside the embedded cockpit */
+.cockpit-embedded #brand-bar{ display:none !important }
+.is-embed #brand-bar { display:none !important }
+
+/* optional: if the image still shows a square, it's in the PNG itself */
+#brand-bar .brand-logo {
+  width:75px; height:75px; object-fit:contain; background:transparent;
+}
+
+/* Remove old cockpit header; BrandBar replaces it */
+.chrome-hdr,
+.cockpit-scope .chrome-hdr { display:none !important }
+
+/* === OOB pill severity global fallback (unscoped, last wins) === */
+/* === OOB pill severity global fallback (unscoped, last wins) === */
+.pill.stat, .pill{
+  padding: 6px 12px;          /* more inner space */
+  border-width: 2px;          /* stronger edge */
+  border-radius: 999px;
+  line-height: 1.15;
+  background-clip: padding-box; /* keep glow off the border */
+}
+
+/* OK = cyan */
+.pill.stat.ok, .pill.ok{
+  color:#00ffc6; border-color:#00ffc6;
+  /* crisp inner edge + existing glow */
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.5),
+    inset 0 0 16px rgba(0,255,198,.35),
+    0 0 24px rgba(0,255,198,.25);
+}
+
+/* WARN = amber */
+.pill.stat.warn, .pill.warn{
+  color:#ff8a00; border-color:#ff8a00;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.5),
+    inset 0 0 16px rgba(255,138,0,.40),
+    0 0 24px rgba(255,138,0,.30);
+}
+
+/* BAD = red */
+.pill.stat.bad, .pill.bad{
+  color:#ff4d4d; border-color:#ff4d4d;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.65),
+    inset 0 0 16px rgba(255,59,92,.35),
+    0 0 20px rgba(255,59,92,.22);
+}
+
+/* === History panel additions === */
+.hud-glass{
+  background:linear-gradient(180deg, rgba(0,247,219,.98), rgba(0,0,0,.98));
+  border:1px solid rgba(30,230,214,.95);
+  backdrop-filter:blur(8px)
+}
+.history-backdrop{ background:rgba(0,0,0,.95); z-index:1000 }
+.history-panel{
+  animation:hist-slide-up .18s ease-out both
+}
+@keyframes hist-slide-up{
+  from{ transform:translateY(16px); opacity:.0 }
+  to{ transform:translateY(0); opacity:1 }
+}
+.hist-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px }
+.hist-title{ font-weight:800; letter-spacing:.1em; color:#1ee6d6; text-transform:uppercase }
+.hist-title-text{ margin-left:8px }
+.hist-list{ display:flex; flex-direction:column; gap:8px }
+.hist-row{
+  display:flex; justify-content:space-between; align-items:center;
+  background:rgba(0,247,219,.08); border:1px solid rgba(30,230,214,.18);
+  border-radius:12px; padding:10px 12px
+}
+.hist-meta{ display:flex; gap:10px; align-items:center }
+.hist-when{ color:#9ca3af; font-size:12px }
+.hist-actions{ display:flex; gap:8px }
+.hist-empty{ color:#9ca3af; font-size:12px; padding:8px }
+.hist-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:12px }
+@media(min-width:720px){ .hist-grid{ grid-template-columns:repeat(4,minmax(0,1fr)) } }
+.hist-card{
+  background:rgba(0,0,0,.25); border:1px solid rgba(30,230,214,.20);
+  border-radius:12px; padding:10px
+}
+.hist-label{ font-size:12px; color:#9ca3af; margin-bottom:6px }
+.hist-value{ font-size:16px; font-weight:700; margin-bottom:6px }
+.hist-sections{ display:grid; grid-template-columns:1fr; gap:12px }
+.hist-section{ background:rgba(0,0,0,.25); border:1px solid rgba(30,230,214,.20); border-radius:12px; padding:10px }
+.hist-section-title{ font-size:12px; color:#9ca3af; margin-bottom:6px }
+.hist-pre{ margin:0; font-size:12px; white-space:pre-wrap; word-break:break-word }
+
+/* === KV list for History detail === */
+.hist-kvs{ display:flex; flex-direction:column; gap:0 }
+.hist-kv{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:13px; padding:6px 8px; border-bottom:1px solid rgba(30,230,214,.12)
+}
+.hist-kv:last-child{ border-bottom:none }
+.hist-kv .k{ color:#9ca3af }
+.hist-kv .v{ font-weight:700 }
+
+/* === Photos grid for History === */
+.hist-photos{ display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 12px }
+.hist-photo{
+  width:96px; height:96px; object-fit:cover; border-radius:8px;
+  border:1px solid rgba(30,230,214,.25); background:#000
+}

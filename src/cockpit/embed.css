@@ -1,0 +1,126 @@
+/* === Cockpit embed CRT black cards === */
+.cockpit-embedded,
+.cockpit-embedded body {
+  background: var(--bg, #05090b7c) !important;
+  color: var(--text, #00f7db) !important;
+}
+
+/* generic reset for embed containers */
+.cockpit-embedded .container,
+.cockpit-embedded .page,
+.cockpit-embedded main {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* hide outer nav and headers */
+.cockpit-embedded .header,
+.cockpit-embedded header.nav,
+.cockpit-embedded .topbar {
+  display: none !important;
+}
+
+/* === CRT black panels for cockpit embed === */
+.cockpit-embedded .card,
+.cockpit-embedded .panel,
+.cockpit-embedded .box,
+.cockpit-embedded .dialog {
+  position: relative;
+  background: #05090b7c !important;                    /* black base */
+  border: 1px solid #00f7db !important;           /* cyan outline */
+  border-radius: 16px !important;
+  box-shadow:
+    0 0 0 1px rgba(0,247,219,.25) inset,
+    0 0 24px rgba(0,247,219,.15) !important;
+  overflow: hidden;                               /* keep grid inside */
+}
+
+/* cyan CRT grid layer behind content */
+.cockpit-embedded .card::before,
+.cockpit-embedded .panel::before,
+.cockpit-embedded .box::before,
+.cockpit-embedded .dialog::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;                                     /* sits under data */
+  background-image:
+    linear-gradient(rgba(0,247,219,.50) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,247,219,.50) 1px, transparent 1px);
+  background-size: 26px 26px, 26px 26px;
+  opacity: .5;                                    /* grid brightness */
+}
+
+/* content sits above grid */
+.cockpit-embedded .card > *,
+.cockpit-embedded .panel > *,
+.cockpit-embedded .box > *,
+.cockpit-embedded .dialog > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* inputs/buttons inside cards */
+.cockpit-embedded .btn,
+.cockpit-embedded button,
+.cockpit-embedded input,
+.cockpit-embedded select,
+.cockpit-embedded textarea {
+  background: #000 !important;
+  color: #00f7db !important;
+  border: 1px solid #00f7db !important;
+  border-radius: 12px !important;
+}
+
+/* hover/focus highlight */
+.cockpit-embedded .btn:hover,
+.cockpit-embedded button:hover,
+.cockpit-embedded input:focus,
+.cockpit-embedded select:focus,
+.cockpit-embedded textarea:focus {
+  border-color: #00f7db !important;
+  box-shadow:
+    0 0 0 1px #00f7db inset,
+    0 0 14px rgba(0,247,219,.35) !important;
+}
+
+/* gauges and text inside cards */
+.cockpit-embedded .gauge .score,
+.cockpit-embedded h1,
+.cockpit-embedded h2,
+.cockpit-embedded h3,
+.cockpit-embedded .label {
+  color: #00f7db !important;
+  text-shadow: 0 0 8px rgba(0,247,219,.25);
+}
+
+/* muted text for secondary info */
+.cockpit-embedded small,
+.cockpit-embedded .muted,
+.cockpit-embedded .hint {
+  color: rgba(0,247,219,.6) !important;
+}
+
+/* table or box elements keep grid aesthetic */
+.cockpit-embedded table,
+.cockpit-embedded .stat-box {
+  background: transparent !important;
+  border: 1px solid #00f7db !important;
+  box-shadow: 0 0 20px rgba(0,247,219,.1) inset;
+  border-radius: 8px !important;
+}
+
+/* footer area inside embed */
+.cockpit-embedded .footer,
+.cockpit-embedded .chrome-ftr {
+  border-top: 1px solid #00f7db !important;
+  color: #00f7db !important;
+  background: #000 !important;
+  padding: 16px;
+  text-align: center;
+}

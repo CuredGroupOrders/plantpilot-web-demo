@@ -1,0 +1,202 @@
+/* =========================
+   index.css — Drop-in HUD skin + base
+   ========================= */
+
+/* Load display + body fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Audiowide&display=swap");
+
+/* -------- Base (neutral, non-HUD screens) -------- */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+
+:root{
+  --bg:#000000;
+  --text:#00f7db;
+  --muted:#8aa7aa;
+  --border:#1ee6d6;
+  --card:#000000;
+  --accent:#1ee6d6;
+}
+
+body{ background:var(--bg); color:var(--text); }
+
+/* Layout primitives (kept) */
+.container{ max-width:960px; margin:0 auto; padding:16px; }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
+.row{ display:grid; grid-template-columns:1fr; gap:12px; }
+@media (min-width:720px){ .row-2{ grid-template-columns:1fr 1fr } .row-3{ grid-template-columns:1fr 1fr 1fr } }
+
+h1,h2,h3{ margin:0 0 8px }
+label{ display:block; font-size:14px; color:var(--muted); margin-bottom:4px }
+input,select{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+  background:#0b1316; color:var(--text);
+}
+input:focus,select:focus{ outline:2px solid var(--accent); border-color:transparent }
+
+/* Buttons */
+.btn{ cursor:pointer; border:1px solid var(--border); background:#122026; color:#fff; padding:10px 14px; border-radius:10px }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#052a27 }
+.btn.ghost{ background:transparent }
+.btn:disabled{ opacity:.5; cursor:not-allowed }
+
+/* Status badges (fallback) */
+.badge{ font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border) }
+.badge.ok{ color:#37ff7a; background: color-mix(in oklab, #37ff7a 18%, transparent); border-color: color-mix(in oklab, #37ff7a 40%, transparent) }
+.badge.warn{ color:#ffb627; background: color-mix(in oklab, #ffb627 18%, transparent); border-color: color-mix(in oklab, #ffb627 40%, transparent) }
+.badge.bad{ color:#ff4d4d; background: color-mix(in oklab, #ff4d4d 18%, transparent); border-color: color-mix(in oklab, #ff4d4d 40%, transparent) }
+
+/* Gauges row primitives */
+.gauge{ display:flex; align-items:center; justify-content:space-between }
+.gauge .score{ font-size:28px; font-weight:700; font-variant-numeric: tabular-nums }
+.sub{ color:var(--muted); font-size:13px; margin-top:4px }
+
+/* Dialog */
+.dialog-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:flex-end; justify-content:center; padding:16px }
+.dialog{
+  width:100%; max-width:720px; background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:16px; max-height:85vh; overflow:auto
+}
+.hr{ height:1px; background:var(--border); margin:12px 0 }
+.kv{ display:flex; justify-content:space-between; font-size:14px }
+
+/* Bottom tabbar */
+.container{ padding-bottom:80px }
+.tabbar{
+  position:fixed; left:0; right:0; bottom:0;
+  display:flex; gap:8px; justify-content:space-around;
+  padding:10px 12px; background:var(--card); border-top:1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+.tabbar button{
+  flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--border);
+  background:#000000; color:#fff; cursor:pointer;
+}
+.tabbar button.active{ outline:2px solid var(--accent); border-color:transparent }
+
+/* ---------- HUD skin (apply by adding .hud-skin-neo to the cockpit root) ---------- */
+.hud-skin-neo{
+  --neo-bg:#081216;
+  --neo-text:#00f7db;
+  --neo-dim:#80b4b8;
+  --neo-cyan:#00f7db;   /* ENV */
+  --neo-amber:#ff9b13;  /* ROOT */
+  --neo-red:#ff3b5c;    /* Alerts */
+  --neo-grid:rgba(0,247,219,.10);
+  --accent:var(--neo-cyan);
+  color:var(--neo-text);
+}
+
+/* Background grid + subtle glows */
+.hud-skin-neo{
+  background:
+    radial-gradient(1200px 800px at 16% 20%, rgba(0, 0, 0, 0.08), transparent 40%),
+    radial-gradient(1200px 800px at 84% 28%, rgba(255,155,19,.06), transparent 45%),
+    var(--neo-bg);
+}
+.hud-skin-neo::before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.14;
+  background-image:
+    linear-gradient(to right, var(--neo-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--neo-grid) 1px, transparent 1px);
+  background-size:40px 40px, 40px 40px;
+}
+
+/* Beveled cockpit card */
+.hud-skin-neo .card{
+  position:relative; border-radius:18px;
+  background:linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.36));
+  border:1px solid #0a1e21; box-shadow:0 0 24px rgba(0,255,220,.06) inset;
+}
+.hud-skin-neo .card::before{
+  content:""; position:absolute; inset:8px; border:1px solid #000000; border-radius:12px; pointer-events:none
+}
+
+/* Section label + cyan rule */
+.hud-skin-neo .cpk-section{
+  margin:12px 4px 6px 4px; color:var(--neo-cyan);
+  text-transform:uppercase; font:700 12px/1.1 Audiowide, Orbitron, system-ui; letter-spacing:.16em;
+}
+.hud-skin-neo .cpk-rule{
+  height:1px; margin:10px 0;
+  background:linear-gradient(90deg, transparent, #0c3c3e 12%, #0c3c3e 88%, transparent);
+}
+
+/* Pills / chips severity mapped to mock colors */
+.hud-skin-neo .pill{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius:999px; font-weight:800; letter-spacing:.02em;
+  border:1px solid currentColor;
+}
+.hud-skin-neo .pill.sev-good{ color:var(--neo-cyan);  background: rgba(0,247,219,.10) }
+.hud-skin-neo .pill.sev-warn{ color:var(--neo-amber); background: rgba(255,155,19,.10) }
+.hud-skin-neo .pill.sev-bad { color:var(--neo-red);   background: rgba(255,59,92,.10) }
+
+/* Buttons as neon capsules */
+.hud-skin-neo .btn{
+  border-radius:999px; border:1px solid rgba(0,247,219,.35);
+  background:rgba(0,247,219,.08); color:#00f7db;
+  box-shadow:0 0 18px rgba(0,247,219,.22) inset, 0 0 18px rgba(0,247,219,.12);
+}
+.hud-skin-neo .btn:hover{ background:rgba(0,247,219,.12) }
+
+/* Header glass */
+.hud-skin-neo .chrome-hdr{
+  position:sticky; top:0; z-index:5; backdrop-filter:blur(8px);
+  background:linear-gradient(180deg,#061015,#081216); border-bottom:1px solid #0e2225;
+}
+.hud-skin-neo .wordmark{
+  font-family:Audiowide, Orbitron, system-ui; font-weight:800; font-size:20px; color:#bffef4;
+  text-shadow:0 0 16px rgba(0,247,219,.35), 0 0 30px rgba(0,247,219,.18);
+}
+
+/* Trends in HUD */
+.hud-skin-neo .trends-compact .label{ color:var(--neo-dim); text-transform:uppercase; letter-spacing:.12em }
+.hud-skin-neo .trends-compact .value{ color:var(--neo-cyan); font-variant-numeric: tabular-nums }
+.hud-skin-neo .trends-compact path{ stroke:var(--neo-cyan) !important; fill:none !important }
+
+/* Bottom tabbar neon */
+.hud-skin-neo .tabbar{ background:#0b171b; border-top:1px solid #0e2225 }
+.hud-skin-neo .tabbar button{ background:#0e1c20 }
+.hud-skin-neo .tabbar button.active{ outline:2px solid var(--neo-cyan); border-color:transparent }
+
+/* -------- Circular gate gauges (ENV cyan, ROOT amber) --------
+   Drive ring via inline vars on your gauge node:
+   style={{"--gdeg": value*3.6 + "deg", "--gcol":"var(--neo-cyan)"}}
+---------------------------------------------------------------- */
+.hud-skin-neo .gauge{ position:relative; width:144px; height:144px }
+.hud-skin-neo .gauge-ring{
+  position:absolute; inset:0; border-radius:50%;
+  background: conic-gradient(var(--gcol, var(--neo-cyan)) var(--gdeg, 0deg), rgba(255,255,255,.06) 0);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 58px, #000 59px);
+          mask: radial-gradient(circle at 50% 50%, transparent 58px, #000 59px);
+}
+.hud-skin-neo .gauge::after{ /* tick marks */
+  content:""; position:absolute; inset:8px; border-radius:50%;
+  background: conic-gradient(from -90deg, rgba(255,255,255,.16) 0 2deg, transparent 2deg 30deg);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 56px, #000 57px);
+          mask: radial-gradient(circle at 50% 50%, transparent 56px, #000 57px);
+  mix-blend-mode:screen; opacity:.5; pointer-events:none;
+}
+.hud-skin-neo .gauge-core{
+  position:absolute; inset:8px; border-radius:999px;
+  background:#060a0c; border:1px solid #0a1e21; box-shadow: inset 0 0 18px rgba(0,0,0,.6)
+}
+.hud-skin-neo .gauge-val{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:4px;
+  font-family:Audiowide, Orbitron, system-ui; font-weight:800; text-shadow:0 0 14px rgba(0,247,219,.28)
+}
+.hud-skin-neo .gauge-val span{ font-size:44px; line-height:1 }
+.hud-skin-neo .gauge-val small{ opacity:0 } /* hide % to match mock */
+.hud-skin-neo .gauge-lbl{
+  position:absolute; bottom:12px; width:100%; text-align:center;
+  font:700 11px/1.1 Audiowide, Orbitron, system-ui; letter-spacing:.16em; color:#8df9ee; text-transform:uppercase
+}
+
+/* ENV/ROOT color helpers */
+.ic-cyan{ color:var(--neo-cyan) } .ic-amber{ color:var(--neo-amber) } .ic-red{ color:var(--neo-red) }
+
+/* -------- End HUD skin -------- */
+
+/* FINAL: ensure this file wins in order when bundled */
