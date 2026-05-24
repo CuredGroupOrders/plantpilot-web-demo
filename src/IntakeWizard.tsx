@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import SopProfileBadge from "./components/SopProfileBadge";
 import type { StageProfile } from "./data/growroom-rules";
 import {
   KNOWN_SOP_PROFILES,
@@ -155,10 +154,6 @@ export default function IntakeWizard({
     onConfigApplied,
   ]);
 
-  const handleReconfigure = useCallback(() => {
-    setStep("profile");
-  }, []);
-
   const isOptionAvailable = (
     optionSet: Set<string> | Set<number>,
     value: string | number,
@@ -171,6 +166,10 @@ export default function IntakeWizard({
     marginBottom: 12,
     background: "var(--card-bg, #111)",
   };
+
+  if (configApplied) {
+    return null;
+  }
 
   const stepIndicator = (
     <div
@@ -307,9 +306,9 @@ export default function IntakeWizard({
     return (
       <div>
         {stepIndicator}
-        <div style={{ marginBottom: 12 }}>
-          <SopProfileBadge profileKey={profile} />
-        </div>
+        <p style={{ fontSize: 13, color: "#999", margin: "0 0 12px" }}>
+          SOP profile: <strong style={{ color: "var(--accent,#1ee6d6)" }}>{profile}</strong>
+        </p>
         <div style={cardStyle}>
           <h3 style={{ margin: "0 0 12px" }}>Grow Configuration</h3>
           <p style={{ fontSize: 13, color: "#999", margin: "0 0 16px" }}>
@@ -567,43 +566,5 @@ export default function IntakeWizard({
     );
   }
 
-  return (
-    <div>
-      {stepIndicator}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "8px 12px",
-          background: "rgba(16,185,129,0.1)",
-          border: "1px solid rgba(16,185,129,0.3)",
-          borderRadius: 6,
-          marginBottom: 12,
-          fontSize: 13,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <SopProfileBadge profileKey={profile} />
-          <span style={{ color: "#10b981" }}>
-            {stage} · {medium} · {co2Mode || "ambient"} · {lightcycle || "Day"} · {photoperiodH}h
-          </span>
-        </div>
-        <button
-          onClick={handleReconfigure}
-          style={{
-            padding: "4px 12px",
-            background: "transparent",
-            color: "#999",
-            border: "1px solid #444",
-            borderRadius: 4,
-            cursor: "pointer",
-            fontSize: 12,
-          }}
-        >
-          Reconfigure
-        </button>
-      </div>
-    </div>
-  );
+  return null;
 }

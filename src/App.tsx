@@ -861,13 +861,15 @@ export default function App() {
         </div>
       )}
 
-      {/* Gate odometers always visible */}
-      <GateOdometersPanel
-        env={envGate}
-        root={rootGate}
-        irr={irrGate}
-        statusText={overallStatusLabel(useScores)}
-      />
+      {/* Odometers only after setup — avoids empty gauges during the wizard */}
+      {wizardConfigApplied && (
+        <GateOdometersPanel
+          env={envGate}
+          root={rootGate}
+          irr={irrGate}
+          statusText={overallStatusLabel(useScores)}
+        />
+      )}
 
       {viewMode === "intake" ? (
         <>
@@ -894,6 +896,8 @@ export default function App() {
               lists={lists}
               initial={(intake ?? getLastIntake()) ?? undefined}
               targets={targets}
+              compactContext
+              onReconfigure={() => setWizardConfigApplied(false)}
               onDraftChange={(draft) => setIntake(draft)}
               onOpenChecklist={() => setShowChecklist(true)}
               onOpenNutrient={() => setShowNutrient(true)}
@@ -1396,10 +1400,14 @@ function IntakeForm({
   onOpenNutrient,
   targets,
   onApplyConfig,
+  compactContext,
+  onReconfigure,
 }: {
   onSubmit: (i: any) => void;
   onDraftChange?: (i: any) => void;
   initial?: Partial<any>;
+  compactContext?: boolean;
+  onReconfigure?: () => void;
   lists: {
     stagePhase: string[];
     medium: string[];
@@ -1849,18 +1857,17 @@ useEffect(() => {
           marginBottom: 12,
         }}
       >
-                <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%" }}>
-          <div style={{ flex: "0 0 auto" }}>
-            <h1 style={{ margin: 0 }}>Intake</h1>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", flexWrap: "wrap" }}>
+          <h1 style={{ margin: 0 }}>Intake</h1>
+          <div className="sub" style={{ flex: "1 1 auto" }}>
+            {profile} · {stage} · {medium}
+            {lightcycle ? ` · ${lightcycle}` : ""} · {photoperiodH}h
           </div>
-
-          <div style={{ flex: "1 1 auto", display: "flex", justifyContent: "center" }}>
-            <SopProfileBadge profileKey={profile ?? "Default"} />
-          </div>
-
-          <div style={{ flex: "0 0 auto" }}>
-            <div className="sub">Update fields, then Submit &amp; Calculate.</div>
-          </div>
+          {typeof onReconfigure === "function" && (
+            <button type="button" className="btn ghost" onClick={onReconfigure}>
+              Change setup
+            </button>
+          )}
         </div>
 
       </header>
@@ -1879,7 +1886,8 @@ useEffect(() => {
         </div>
       )}
 
-      {/* CONTEXT */}
+      {/* CONTEXT — hidden when wizard already captured grow config */}
+      {!compactContext && (
       <div className="card">
         <h3>Context</h3>
         <div className="row row-3">
@@ -2049,6 +2057,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ENV */}
       <div className="card">
