@@ -13,3 +13,9 @@ export function apiUrl(path: string): string {
   const base = SIDECAR_BASE || API_BASE;
   return base ? `${base}${p}` : p;
 }
+
+/** GAS bridge on sidecar (`/gas?mode=…`). Required on Netlify static deploys. */
+export function gasUrl(query = ""): string {
+  const q = query.startsWith("?") ? query : query ? `?${query}` : "";
+  return apiUrl(`/gas${q}`);
+}

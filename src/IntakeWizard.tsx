@@ -4,6 +4,7 @@ import type { StageProfile } from "./data/growroom-rules";
 import {
   KNOWN_SOP_PROFILES,
   mergeSopProfileList,
+  optionSetHas,
   stageProfilesForSop,
 } from "./lib/sopProfiles";
 
@@ -112,6 +113,18 @@ export default function IntakeWizard({
     }
   }, [step, profile, stage, validOptionsForProfile]);
 
+  useEffect(() => {
+    if (step !== "config") return;
+    if (
+      lightcycle &&
+      optionSetHas(validOptionsForProfile.lightcycles, lightcycle)
+    ) {
+      return;
+    }
+    const first = [...validOptionsForProfile.lightcycles][0];
+    if (first) setLightcycle(String(first));
+  }, [step, profile, lightcycle, validOptionsForProfile]);
+
   const handleProfileNext = useCallback(() => {
     if (!profile) return;
     setStep("config");
@@ -148,10 +161,8 @@ export default function IntakeWizard({
 
   const isOptionAvailable = (
     optionSet: Set<string> | Set<number>,
-    value: string | number
-  ) => {
-    return (optionSet as Set<any>).has(value);
-  };
+    value: string | number,
+  ) => optionSetHas(optionSet, value);
 
   const cardStyle: React.CSSProperties = {
     padding: 16,
@@ -457,10 +468,9 @@ export default function IntakeWizard({
                   ? lists.lightcycle
                   : ["Day", "Night"]
                 ).map((v) => {
-                  const available = isOptionAvailable(
-                    validOptionsForProfile.lightcycles,
-                    v
-                  );
+                  const available =
+                    validOptionsForProfile.lightcycles.size === 0 ||
+                    isOptionAvailable(validOptionsForProfile.lightcycles, v);
                   return (
                     <option
                       key={v}

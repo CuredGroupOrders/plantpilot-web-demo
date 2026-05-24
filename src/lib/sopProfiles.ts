@@ -26,6 +26,21 @@ export function stageProfilesForSop(
   return matched.length ? matched : profiles;
 }
 
+/** Case-insensitive membership for dropdown vs growroom rule sets. */
+export function optionSetHas(
+  optionSet: Set<string> | Set<number>,
+  value: string | number,
+): boolean {
+  if (typeof value === "number") {
+    return (optionSet as Set<number>).has(value);
+  }
+  const v = String(value).trim().toLowerCase();
+  for (const item of optionSet as Set<string>) {
+    if (String(item).trim().toLowerCase() === v) return true;
+  }
+  return false;
+}
+
 export function mergeSopProfileList(fromApi: string[] | undefined): string[] {
   const api = (fromApi ?? []).map(String).filter(Boolean);
   const merged = [...new Set([...api, ...KNOWN_SOP_PROFILES])];

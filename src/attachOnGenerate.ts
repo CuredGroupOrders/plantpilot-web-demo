@@ -1,8 +1,9 @@
 import { useHistory } from "./state/history";
+import { apiUrl } from "./lib/apiUrl";
 
 /** POST /speak and return an MP3 Blob. */
 async function ttsToBlob(text: string, voice?: string): Promise<Blob> {
-  const r = await fetch("/speak", {
+  const r = await fetch(apiUrl("/speak"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text, voice }),

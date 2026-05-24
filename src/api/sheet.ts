@@ -1,7 +1,6 @@
 ﻿// src/api/sheet.ts
+import { apiUrl as sidecarUrl, gasUrl } from "../lib/apiUrl";
 import { mergeSopProfileList } from "../lib/sopProfiles";
-
-const BASE = "/gas";
 
 /* ===== Types ===== */
 export type GateKey = "ENV" | "ROOT" | "IRR";
@@ -168,7 +167,7 @@ export type RnDSymLogPayload = {
 
 /* ===== Restore list normalization (old version) ===== */
 export async function fetchOptions(): Promise<Record<string, string[]>> {
-  const r = await fetch(`${BASE}?mode=options`, { cache: "no-store" });
+  const r = await fetch(gasUrl("mode=options"), { cache: "no-store" });
   const j = await r.json().catch(() => ({} as any));
   const raw: Record<string, any[]> = j?.options ?? {};
 
@@ -204,7 +203,13 @@ export async function fetchOptions(): Promise<Record<string, string[]>> {
   if (!co2Mode.length) co2Mode = ["ambient", "co2"];
 
   let lightcycle = pick("Lightcycle", "Light Cycle");
-  if (!lightcycle.length) lightcycle = cols.find((c) => looksLC(c.vals))?.vals ?? ["day", "night"];
+  if (!lightcycle.length) lightcycle = cols.find((c) => looksLC(c.vals))?.vals ?? ["Day", "Night"];
+  lightcycle = lightcycle.map((v) => {
+    const s = String(v).trim().toLowerCase();
+    if (s === "day") return "Day";
+    if (s === "night") return "Night";
+    return String(v).trim();
+  });
 
   let photoperiodH = pick("Photoperiod (h)", "Photoperiod");
   if (!photoperiodH.length) photoperiodH = ["12", "18"];
@@ -220,18 +225,18 @@ export async function fetchOptions(): Promise<Record<string, string[]>> {
 
 /* ===== cfg + targets ===== */
 export async function fetchCfg(): Promise<any> {
-  const r = await fetch(`${BASE}?mode=cfg`, { cache: "no-store" });
+  const r = await fetch(gasUrl("mode=cfg"), { cache: "no-store" });
   return r.json().catch(() => ({} as any));
 }
 
 export async function fetchTargets(): Promise<Record<string, number>> {
-  const r = await fetch(`${BASE}?mode=targets`, { cache: "no-store" });
+  const r = await fetch(gasUrl("mode=targets"), { cache: "no-store" });
   const j = await r.json().catch(() => ({} as any));
   return (j?.targets ?? {}) as Record<string, number>;
 }
 
 export async function applyConfig(ctx: any, forceReset = false) {
-  const res = await fetch("/gas", {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ mode: "applyConfig", ctx, forceReset }),
@@ -253,7 +258,7 @@ export async function fetchNutrientRecipe(
     stage_id: stageId,
   });
 
-  const r = await fetch(`${BASE}?${params.toString()}`, { cache: "no-store" });
+  const r = await fetch(gasUrl(params.toString()), { cache: "no-store" });
   if (!r.ok) {
     return { enabled: false, reason: `http_${r.status}` };
   }
@@ -263,8 +268,6 @@ export async function fetchNutrientRecipe(
   }
   return j as NutrientRecipe;
 }
-
-import { apiUrl as sidecarUrl } from "../lib/apiUrl";
 
 function normalizeEvaluatePayload(raw: EnginePayload): EnginePayload {
 
@@ -311,8 +314,10 @@ export async function evaluate(
     /* fall through to /gas when sidecar unreachable */
   }
   const labels = encodeURIComponent(JSON.stringify(intake));
-  const url = `${BASE}?mode=evaluate&apply=${apply}&labels=${labels}`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(
+    gasUrl(`mode=evaluate&apply=${apply}&labels=${labels}`),
+    { cache: "no-store" },
+  );
   if (!res.ok) throw new Error(`engine ${res.status}`);
   const raw = (await res.json()) as EnginePayload;
   return normalizeEvaluatePayload(raw);
@@ -329,7 +334,7 @@ export async function ping(): Promise<
 > {
   const t0 = (typeof performance !== "undefined" ? performance.now() : Date.now());
   try {
-    const r = await fetch(`${BASE}?mode=ping`, { cache: "no-store" });
+    const r = await fetch(gasUrl("mode=ping"), { cache: "no-store" });
     const latencyMs = Math.round(((typeof performance !== "undefined" ? performance.now() : Date.now()) - t0));
     if (!r.ok) {
       return { ok: false as const, status: r.status, latencyMs };
@@ -382,11 +387,11 @@ async function getJSON(u: string) {
 /** Mirrors Intake!D:E. Prefers ?mode=symptoms, falls back to INTAKE_SYM_* named ranges. */
 export async function fetchSymptoms(): Promise<Symptom[]> {
   try {
-    const r = await getJSON(`${BASE}?mode=symptoms`);
+    const r = await getJSON(gasUrl("mode=symptoms"));
     if (r?.items && Array.isArray(r.items)) return r.items as Symptom[];
   } catch {}
   const names = encodeURIComponent("INTAKE_SYM_KEYS,INTAKE_SYM_FLAGS");
-  const r = await getJSON(`${BASE}?mode=nrs&names=${names}`).catch(() => ({} as any));
+  const r = await getJSON(gasUrl(`mode=nrs&names=${names}`)).catch(() => ({} as any));
   const keys: string[] = (r?.ranges?.INTAKE_SYM_KEYS ?? [])
     .flat()
     .map((x: any) => String(x || ""))
@@ -397,7 +402,7 @@ export async function fetchSymptoms(): Promise<Symptom[]> {
 
 /** Toggle a single symptom checkbox in Intake!E for the given key from Intake!D. */
 export async function setSymptom(key: string, checked: boolean): Promise<void> {
-  const res = await fetch(`${BASE}`, {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ symptoms: { map: { [key]: checked } } }),
@@ -431,7 +436,7 @@ export async function fetchSymTop3(): Promise<SymTop3Payload> {
     "SYM_IRR_SCORES_TOP3",
   ].join(",");
   try {
-    const r = await getJSON(`${BASE}?mode=nrs&names=${encodeURIComponent(names)}`);
+    const r = await getJSON(gasUrl(`mode=nrs&names=${encodeURIComponent(names)}`));
     const R = (n: string) => (r?.ranges?.[n] || []) as any[][];
     const takeTop3 = (m: any[][]): Top3Row[] =>
       m.slice(0, 3).map((row) => [String(row?.[0] ?? ""), String(row?.[1] ?? ""), Number(row?.[2] ?? 0)]);
@@ -492,7 +497,7 @@ export type RDSummary = {
 
 export async function fetchRDSummary(experimentId: string): Promise<RDSummary> {
   const params = new URLSearchParams({ mode: "rdSummary", experimentId });
-  const res = await fetch(`${BASE}?${params.toString()}`, { cache: "no-store" });
+  const res = await fetch(gasUrl(params.toString()), { cache: "no-store" });
   const json = await res.json().catch(() => ({} as any));
   return json as RDSummary;
 }
@@ -505,7 +510,7 @@ export async function postRDSnapshot(args: {
   overrides: RDSnapshotOverrides;
 }): Promise<any> {
   const params = new URLSearchParams({ mode: "rdSnapshot" });
-  const res = await fetch(`${BASE}?${params.toString()}`, {
+  const res = await fetch(gasUrl(params.toString()), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -526,7 +531,7 @@ export async function fetchRnDPhotos(params: {
   if (params.groupId) search.set("groupId", params.groupId);
   if (params.logId) search.set("logId", params.logId);
 
-  const res = await fetch(`${BASE}?${search.toString()}`, { cache: "no-store" });
+  const res = await fetch(gasUrl(search.toString()), { cache: "no-store" });
   const json = await res.json().catch(() => ({} as any));
 
   const photosRaw = Array.isArray(json.photos) ? json.photos : [];
@@ -544,7 +549,7 @@ export async function fetchRnDPhotos(params: {
 export async function appendRnDPhoto(
   record: RnDPhotoAppendRequest
 ): Promise<{ ok: boolean; log_id?: string; experiment_id?: string; group_id?: string; row?: number; version?: string }> {
-  const res = await fetch(`${BASE}?mode=rdPhoto`, {
+  const res = await fetch(gasUrl("mode=rdPhoto"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -558,7 +563,7 @@ export async function appendRnDPhoto(
 export async function deleteRnDPhoto(
   req: RnDPhotoDeleteRequest
 ): Promise<{ ok: boolean; deletedRow?: number; reason?: string; version?: string }> {
-  const res = await fetch(`${BASE}?mode=rdPhotoDelete`, {
+  const res = await fetch(gasUrl("mode=rdPhotoDelete"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -582,7 +587,7 @@ export async function fetchRNDNotes(params: {
   if (params.groupId) {
     qs.set("groupId", params.groupId);
   }
-  const res = await fetch(`${BASE}?${qs.toString()}`, { cache: "no-store" });
+  const res = await fetch(gasUrl(qs.toString()), { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch R&D notes");
   const json = await res.json().catch(() => ({} as any));
   const list = Array.isArray(json?.notes) ? json.notes : [];
@@ -604,7 +609,7 @@ export async function postRNDNote(payload: {
     runKey: payload.runKey,
     noteText: payload.noteText,
   };
-  const res = await fetch(`${BASE}`, {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -622,7 +627,7 @@ export async function fetchRDRuns(experimentId: string): Promise<RnDRunRecord[]>
     mode: "rdRuns",
     experimentId,
   });
-  const res = await fetch(`${BASE}?${qs.toString()}`, { cache: "no-store" });
+  const res = await fetch(gasUrl(qs.toString()), { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch R&D runs");
   const json = await res.json().catch(() => ({} as any));
   const list = Array.isArray(json?.runs) ? json.runs : [];
@@ -633,7 +638,7 @@ export async function fetchAllRDRuns(): Promise<RnDRunRecord[]> {
   const qs = new URLSearchParams({
     mode: "rdRunsAll",
   });
-  const res = await fetch(`${BASE}?${qs.toString()}`, { cache: "no-store" });
+  const res = await fetch(gasUrl(qs.toString()), { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch all R&D runs");
   const json = await res.json().catch(() => ({} as any));
   const list = Array.isArray(json?.runs) ? json.runs : [];
@@ -646,7 +651,7 @@ export async function updateRDRunStatus(params: {
   cfgToken: string;
   status: "draft" | "active" | "finished";
 }): Promise<void> {
-  const res = await fetch(`${BASE}`, {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -666,7 +671,7 @@ export async function updateRDRunStatus(params: {
 /* ===== R&D symptoms ===== */
 
 export async function postRDSymActive(payload: RnDSymActivePayload): Promise<void> {
-  const res = await fetch(`${BASE}`, {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
@@ -684,7 +689,7 @@ export async function postRDSymActive(payload: RnDSymActivePayload): Promise<voi
 }
 
 export async function postRDSymLog(payload: RnDSymLogPayload): Promise<void> {
-  const res = await fetch(`${BASE}`, {
+  const res = await fetch(gasUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
