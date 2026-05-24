@@ -19,7 +19,7 @@ body{ font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif }
 body{ background:var(--bg); color:var(--text) }
 
 /* Layout primitives */
-.container{ max-width:960px; margin:0 auto; padding:16px }
+.container{ max-width:1280px; margin:0 auto; padding:20px 24px }
 .card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px }
 .row{ display:grid; grid-template-columns:1fr; gap:12px }
 @media(min-width:720px){ .row-2{grid-template-columns:1fr 1fr} .row-3{grid-template-columns:1fr 1fr 1fr} }
@@ -148,25 +148,21 @@ body::before{
 /* === Sticky Brand Bar (PlantPilot) === */
 #brand-bar{
   position:sticky; top:0; z-index:1000;
-  display:flex; align-items:center; justify-content:center;
+  display:flex; align-items:center; justify-content:space-between;
   background:rgba(5,9,11,.92); backdrop-filter:blur(6px);
   border-bottom:1px solid var(--border,#00f7db);
-  padding:10px 16px
+  padding:8px 24px; max-width:100%
 }
-#brand-bar .brand-link{ display:flex; align-items:center; gap:12px; text-decoration:none }
-#brand-bar .brand-logo{ width:150px; height:150px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(0,247,219,.45)) }
-#brand-bar .brand-text{ display:flex; flex-direction:column; line-height:1.1 }
-#brand-bar .brand-name{ font-family:Audiowide,Orbitron,system-ui; font-size:20px; font-weight:800; letter-spacing:.14em; color:var(--accent,#1ee6d6) }
-#brand-bar .brand-sub{  font-family:Inter,system-ui; font-size:17px; color:var(--accent,#1ee6d6); opacity:.8 }
+#brand-bar .brand-link{ display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit }
+#brand-bar .brand-logo{ width:32px; height:32px; object-fit:contain; flex-shrink:0 }
+#brand-bar .brand-name{
+  font-family:Inter,system-ui,sans-serif; font-size:15px; font-weight:700;
+  letter-spacing:.04em; color:var(--accent,#1ee6d6)
+}
 
 /* Hide brand bar when running inside the embedded cockpit */
 .cockpit-embedded #brand-bar{ display:none !important }
 .is-embed #brand-bar { display:none !important }
-
-/* optional: if the image still shows a square, it's in the PNG itself */
-#brand-bar .brand-logo {
-  width:75px; height:75px; object-fit:contain; background:transparent;
-}
 
 /* Remove old cockpit header; BrandBar replaces it */
 .chrome-hdr,

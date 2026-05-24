@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import SopProfileBadge from "./components/SopProfileBadge";
 import type { StageProfile } from "./data/growroom-rules";
+import {
+  KNOWN_SOP_PROFILES,
+  mergeSopProfileList,
+  stageProfilesForSop,
+} from "./lib/sopProfiles";
 
 export type WizardConfig = {
   profile: string;
@@ -41,8 +46,12 @@ export default function IntakeWizard({
   const [step, setStep] = useState<WizardStep>(
     configApplied ? "ready" : "profile"
   );
+  const sopChoices = useMemo(
+    () => mergeSopProfileList(lists.sopProfile),
+    [lists.sopProfile],
+  );
   const [profile, setProfile] = useState(
-    initialConfig?.profile ?? lists.sopProfile?.[0] ?? "Default"
+    initialConfig?.profile ?? sopChoices[0] ?? "SharkmouseFarms",
   );
   const [stage, setStage] = useState(
     initialConfig?.stage ?? lists.stagePhase?.[0] ?? ""
@@ -64,12 +73,8 @@ export default function IntakeWizard({
   );
   const [mode, setMode] = useState(initialConfig?.mode ?? "automation");
 
-  const profileKey = profile.toLowerCase().replace(/\s+/g, "");
-
   const validOptionsForProfile = useMemo(() => {
-    const profileProfiles = stageProfiles.filter(
-      (p) => p.key.toLowerCase().endsWith(profileKey)
-    );
+    const profileProfiles = stageProfilesForSop(stageProfiles, profile);
 
     const stages = new Set<string>();
     const co2Modes = new Set<string>();
@@ -95,7 +100,7 @@ export default function IntakeWizard({
       containers: new Set(lists.containerSize),
       mediums: new Set(lists.medium),
     };
-  }, [profileKey, stageProfiles, lists]);
+  }, [profile, stageProfiles, lists]);
 
   useEffect(() => {
     if (
@@ -239,7 +244,7 @@ export default function IntakeWizard({
               gap: 10,
             }}
           >
-            {(lists.sopProfile.length ? lists.sopProfile : ["Default"]).map(
+            {(sopChoices.length ? sopChoices : KNOWN_SOP_PROFILES).map(
               (p) => (
                 <button
                   key={p}

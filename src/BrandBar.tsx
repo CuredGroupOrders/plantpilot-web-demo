@@ -12,12 +12,9 @@ export default function BrandBar() {
         gap: 12,
       }}
     >
-      <a className="brand-link" href="/">
-        <img className="brand-logo" src={logoUrl} alt="PlantPilot logo" />
-        <span className="brand-text">
-          <span className="brand-name">PLANTPILOT</span>
-          <span className="brand-sub">by SharkMouseFarms</span>
-        </span>
+      <a className="brand-link" href="/" title="PlantPilot">
+        <img className="brand-logo" src={logoUrl} alt="" aria-hidden />
+        <span className="brand-name">PlantPilot</span>
       </a>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <ConnectionPill />

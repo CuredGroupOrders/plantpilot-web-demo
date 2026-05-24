@@ -1,4 +1,6 @@
 ﻿// src/api/sheet.ts
+import { mergeSopProfileList } from "../lib/sopProfiles";
+
 const BASE = "/gas";
 
 /* ===== Types ===== */
@@ -207,8 +209,9 @@ export async function fetchOptions(): Promise<Record<string, string[]>> {
   let photoperiodH = pick("Photoperiod (h)", "Photoperiod");
   if (!photoperiodH.length) photoperiodH = ["12", "18"];
 
-  // SOP profile list – prefer plural naming
+  // SOP profile list – prefer plural naming; fallback when GAS/options empty (v6 sidecar)
   let sopProfile = pick("sop_profiles", "SOP profiles", "SOP profile", "Profile", "Profiles", "sop_profile");
+  sopProfile = mergeSopProfileList(sopProfile);
 
   const options = { stagePhase, medium, containerSize, co2Mode, lightcycle, photoperiodH, sopProfile };
   (window as any).__LIST_OPTIONS = options;

@@ -551,15 +551,14 @@ export default function App() {
     } catch {}
   }, [reservoirGal]);
 
-      // initial cfg + lists + targets with Afterburn loader
+      // initial cfg + lists + targets (no boot video — desktop-first)
   useEffect(() => {
     (async () => {
       try {
         await run(
           {
-            title: "Booting PlantPilot",
-            message: "Spooling up Afterburner…",
-            video: "afterburn",
+            title: "Loading",
+            message: "Fetching options and targets…",
             cancellable: false,
           },
           async () => {
