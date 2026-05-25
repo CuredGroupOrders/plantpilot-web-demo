@@ -6,7 +6,6 @@ import { useSheetSnap } from "../state/sheetSnap";
 import { publishWire } from "../shared/wire";
 import IntakeWizard, { type WizardConfig } from "../IntakeWizard";
 import type { ReactNode } from "react";
-import { mergeSopProfileList } from "../lib/sopProfiles";
 import {
   buildEffectivePayload,
   computeDLI,
@@ -18,16 +17,6 @@ import {
   type ConfigContext,
   type Intake,
 } from "./helpers";
-
-const defaultLists = () => ({
-  stagePhase: [] as string[],
-  medium: [] as string[],
-  containerSize: [] as string[],
-  co2Mode: [] as string[],
-  lightcycle: [] as string[],
-  photoperiodH: [] as string[],
-  sopProfile: mergeSopProfileList([]),
-});
 import { submitIntakeDraft } from "./submitIntake";
 
 export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
@@ -35,7 +24,15 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
   const setLatest = useSheetSnap((s) => s.setLatest);
 
   const [intake, setIntake] = useState<Intake | null>(() => getLastIntake());
-  const [lists, setLists] = useState(defaultLists);
+  const [lists, setLists] = useState({
+    stagePhase: [] as string[],
+    medium: [] as string[],
+    containerSize: [] as string[],
+    co2Mode: [] as string[],
+    lightcycle: [] as string[],
+    photoperiodH: [] as string[],
+    sopProfile: [] as string[],
+  });
   const [targets, setTargets] = useState<Record<string, number>>({});
   const [cfgKey, setCfgKey] = useState<string | null>(null);
   const [wizardConfigApplied, setWizardConfigApplied] = useState(false);
@@ -53,13 +50,9 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
       try {
         await run(
           { title: "Loading", message: "Fetching options…", cancellable: false },
-          async (report) => {
-            report.progress(0.15, "Loading dropdown options");
-            const optionsP = Sheet.fetchOptions();
-            report.progress(0.35, "Loading target bands");
-            const targetsP = Sheet.fetchTargets();
-            const [options, t] = await Promise.all([optionsP, targetsP]);
-            report.progress(0.9, "Applying lists");
+          async () => {
+            await Sheet.fetchCfg();
+            const options = await Sheet.fetchOptions();
             setLists({
               stagePhase: options.stagePhase ?? [],
               medium: options.medium ?? [],
@@ -69,8 +62,7 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
               photoperiodH: options.photoperiodH ?? [],
               sopProfile: options.sopProfile ?? [],
             });
-            setTargets(t);
-            report.progress(1, "Ready");
+            setTargets(await Sheet.fetchTargets());
           },
         );
       } catch (e) {

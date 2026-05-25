@@ -71,10 +71,7 @@ export default function BaselineHistory() {
   const { list, selectedId, select, back, remove, exportOne, exportAll, open, removePhoto } = useHistory();
   const [photos, setPhotos] = useState<Array<{ id: string; url: string }>>([]);
 
-  useEffect(() => {
-    open();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load history once on mount
-  }, []);
+  useEffect(() => { open(); }, [open]);
 
   const ordered = useMemo(() => list.slice().sort((a, b) => b.t - a.t), [list]);
   const selected = useMemo(() => (selectedId ? list.find(x => x.id === selectedId) : undefined), [list, selectedId]);

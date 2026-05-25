@@ -256,13 +256,9 @@ export default function App() {
             message: "Fetching options and targets…",
             cancellable: false,
           },
-          async (report) => {
-            report.progress(0.2, "Loading options");
-            const [options, t] = await Promise.all([
-              Sheet.fetchOptions(),
-              Sheet.fetchTargets(),
-            ]);
-            report.progress(0.85, "Applying lists");
+          async () => {
+            await Sheet.fetchCfg();
+            const options: any = await Sheet.fetchOptions();
             setLists({
               stagePhase: options.stagePhase ?? [],
               medium: options.medium ?? [],
@@ -272,8 +268,9 @@ export default function App() {
               photoperiodH: options.photoperiodH ?? [],
               sopProfile: options.sopProfile ?? [],
             });
+
+            const t = await Sheet.fetchTargets();
             setTargets(t);
-            report.progress(1, "Ready");
           }
         );
       } catch (e) {

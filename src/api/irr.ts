@@ -1,4 +1,5 @@
 import { apiUrl } from "../lib/apiUrl";
+import { normalizeContainerGal } from "../lib/containerGal";
 
 export type IrrSolvePlan = {
   ok: boolean;
@@ -66,10 +67,16 @@ export async function solveIrrDraft(
   intake: Record<string, unknown>,
   dirty?: string[]
 ): Promise<IrrSolvePlan> {
+  const normalized = {
+    ...intake,
+    container: normalizeContainerGal(
+      String(intake.container ?? intake.containerSize ?? "1"),
+    ),
+  };
   const r = await fetch(apiUrl("/sheet/irr/solveDraft"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ intake, dirty }),
+    body: JSON.stringify({ intake: normalized, dirty }),
     cache: "no-store",
   });
   return (await r.json()) as IrrSolvePlan;

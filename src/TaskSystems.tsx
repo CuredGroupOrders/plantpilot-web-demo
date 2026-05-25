@@ -325,10 +325,9 @@ export function TaskProvider({
         return orig(input as any, init);
       }
 
-      // Tie progress to elapsed time but cap below 90% until the request returns.
-      const DURATION_TO_CAP = 45000; // ms
+      const DURATION_TO_92 = 15000; // ms
       const START = 0.06;
-      const TARGET = 0.88;
+      const TARGET = 0.92;
 
       return run(
         {
@@ -341,7 +340,7 @@ export function TaskProvider({
           report.progress(START);
           const id = setInterval(() => {
             const t = performance.now() - startTs;
-            const k = Math.min(1, t / DURATION_TO_CAP);
+            const k = Math.min(1, t / DURATION_TO_92);
             const eased = 1 - Math.pow(1 - k, 1.7);
             const ratio = START + (TARGET - START) * eased;
             report.progress(ratio);
