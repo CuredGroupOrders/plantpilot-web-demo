@@ -19,7 +19,7 @@ export default function HomePage() {
   }, [openIntake]);
 
   return (
-    <div className="cockpit-home" style={{ minHeight: "100vh" }}>
+    <div className="cockpit-home hud-skin-neo" style={{ minHeight: "100vh" }}>
       <Cockpit />
       <IntakeModal open={showIntake} onClose={closeIntake} />
       {showSymptoms && (

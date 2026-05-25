@@ -29,7 +29,25 @@ export async function submitIntakeDraft(
 ): Promise<void> {
   const { targets, cfgKey, report, signal } = opts;
 
-  report.progress(0.15, "Applying configuration");
+  const creep = (from: number, to: number, ms: number, msg: string) =>
+    new Promise<void>((resolve) => {
+      const t0 = performance.now();
+      const id = window.setInterval(() => {
+        if (signal.aborted) {
+          clearInterval(id);
+          resolve();
+          return;
+        }
+        const k = Math.min(1, (performance.now() - t0) / ms);
+        report.progress(from + (to - from) * k, msg);
+        if (k >= 1) {
+          clearInterval(id);
+          resolve();
+        }
+      }, 120);
+    });
+
+  report.progress(0.08, "Applying configuration");
   const ctx: ConfigContext = {
     stage: draft.stage || "",
     medium: draft.medium || "",
@@ -40,15 +58,20 @@ export async function submitIntakeDraft(
     profile: draft.profile ?? "SharkmouseFarms",
   };
 
-  const freshTargets = (await Sheet.applyConfig(ctx)) ?? targets;
+  const applyP = Sheet.applyConfig(ctx);
+  const creepP = creep(0.08, 0.38, 5000, "Syncing sheet configuration");
+  const [freshTargets] = await Promise.all([applyP, creepP]);
+  const resolvedTargets = freshTargets ?? targets;
   if (signal.aborted) return;
 
-  report.progress(0.45, "Building payload");
-  const eff = buildEffectivePayload(draft, freshTargets);
+  report.progress(0.42, "Building payload");
+  const eff = buildEffectivePayload(draft, resolvedTargets);
   if (signal.aborted) return;
 
-  report.progress(0.65, "Writing + recalculating engine");
-  const writeRes = await Sheet.evaluate(eff as any, 1);
+  report.progress(0.55, "Running growroom engine");
+  const evalP = Sheet.evaluate(eff as any, 1);
+  const evalCreepP = creep(0.55, 0.82, 8000, "Calculating gates and constraints");
+  const [writeRes] = await Promise.all([evalP, evalCreepP]);
 
   const __bs_pc = computePrimaryConstraint(writeRes as any);
   if (!__bs_pc) throw new Error("BaselineSnapshot: primaryConstraint missing");
@@ -56,7 +79,7 @@ export async function submitIntakeDraft(
   const __bs_intakeSubmitted = draft as any;
   const __bs_intakeEffective = buildEffectivePayload(
     draft as any,
-    freshTargets as any,
+    resolvedTargets as any,
   ) as any;
 
   if (!Number.isFinite(Number(__bs_intakeEffective.tempC)))
