@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import CockpitPage from "./dashboard/CockpitPage";
+import HomePage from "./pages/HomePage";
 import BrandBar from "./BrandBar";
 import { TaskProvider } from "./TaskSystems";
 import { installLabelDriftDetector } from "./dev/labelDrift";
@@ -43,8 +44,12 @@ declare global { interface Window { __lastSubmitAt?: number } }
   );
 })();
 
-const RootRouter = () =>
-  window.location.pathname.startsWith("/cockpit") ? <CockpitPage /> : <App />;
+const RootRouter = () => {
+  const path = window.location.pathname;
+  if (path.startsWith("/cockpit")) return <CockpitPage />;
+  if (path.startsWith("/rnd")) return <App />;
+  return <HomePage />;
+};
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

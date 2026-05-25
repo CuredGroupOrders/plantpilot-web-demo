@@ -35,7 +35,7 @@ function vibrate(ms = 30) {
 }
 
 export default function ActionBar() {
-  const { showHistory, toggleHistory, hideHistory } = useUi();
+  const { showHistory, toggleHistory, hideHistory, openIntake, openSymptoms } = useUi();
   const [toast, setToast] = useState("");
   const [camOpen, setCamOpen] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -194,7 +194,7 @@ export default function ActionBar() {
   };
   const row: React.CSSProperties = {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+    gridTemplateColumns: "repeat(6, 1fr)",
     gap: 8,
   };
   const btn: React.CSSProperties = {
@@ -221,6 +221,12 @@ export default function ActionBar() {
     <>
       <div style={bar}>
         <div style={row}>
+          <button style={btn} onClick={openIntake}>
+            Intake
+          </button>
+          <button style={btn} onClick={openSymptoms}>
+            Symptoms
+          </button>
           <button style={btn} onClick={toggleHistory}>
             History
           </button>

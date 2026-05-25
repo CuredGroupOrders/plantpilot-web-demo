@@ -11,20 +11,12 @@ import React, {
   useRef,
   useState
 } from "react";
-import cockpitLoaderVideo from "./assets/cockpit-loader.mp4";
-import intakeLoaderVideo from "./assets/intake-loader.mp4";
-import afterburnVideo from "./assets/Afterburn.mp4";
-import alchemyVideo from "./assets/alchemy.mp4";
-
 import { createPortal } from "react-dom";
-
-type TaskVideo = "cockpit" | "intake" | "afterburn" | "alchemy";
 
 type TaskOptions = {
   title?: string;
   message?: string;
   cancellable?: boolean;
-  video?: TaskVideo;
 };
 type Reporter = { progress: (ratio: number | null, message?: string) => void };
 type RunTask = <T>(
@@ -41,7 +33,6 @@ type TaskState = {
   ratio: number | null;
   cancellable: boolean;
   cancel?: () => void;
-  video: TaskVideo;
 };
 
 const Ctx = createContext<{ run: RunTask } | null>(null);
@@ -80,7 +71,6 @@ export function TaskProvider({
     message: "Please wait",
     ratio: null,
     cancellable: false,
-    video: "cockpit"
   });
 
   const lastActive = useRef<HTMLElement | null>(null);
@@ -297,7 +287,6 @@ export function TaskProvider({
               close();
             }
           : undefined,
-        video: opts.video ?? "cockpit"
       });
       try {
         const out = await fn(reporter, ctrl.signal);
@@ -345,7 +334,6 @@ export function TaskProvider({
           title: autoTitle,
           message: autoMessage,
           cancellable: false,
-          video: "cockpit"
         },
         async (report) => {
           const startTs = performance.now();
@@ -392,7 +380,6 @@ export function TaskProvider({
                 message: autoMessage,
                 ratio: null,
                 cancellable: false,
-                video: "cockpit"
               }
         );
 
@@ -449,15 +436,6 @@ export function TaskProvider({
 
   const value = useMemo(() => ({ run }), [run]);
 
-  let videoSrc = cockpitLoaderVideo;
-
-if (state.video === "intake") {
-  videoSrc = intakeLoaderVideo;
-} else if (state.video === "afterburn") {
-  videoSrc = afterburnVideo;
-} else if (state.video === "alchemy") {
-  videoSrc = alchemyVideo;
-}
   return (
     <Ctx.Provider value={value}>
       {children}
@@ -477,18 +455,6 @@ if (state.video === "intake") {
                   <div className="task-title">{state.title}</div>
                   <div className="task-sub">{state.message}</div>
                 </div>
-              </div>
-
-              {/* loader video above the progress bar */}
-              <div className="task-media">
-                <video
-                  src={videoSrc}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                />
               </div>
 
               <div className="task-progress" aria-live="polite">

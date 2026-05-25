@@ -20,6 +20,7 @@ body{ background:var(--bg); color:var(--text) }
 
 /* Layout primitives */
 .container{ max-width:1280px; margin:0 auto; padding:20px 24px }
+.cockpit-home .cockpit-scope{ max-width:1400px; margin:0 auto; padding:0 20px 96px }
 .card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px }
 .row{ display:grid; grid-template-columns:1fr; gap:12px }
 @media(min-width:720px){ .row-2{grid-template-columns:1fr 1fr} .row-3{grid-template-columns:1fr 1fr 1fr} }
