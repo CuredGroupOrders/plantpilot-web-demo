@@ -69,7 +69,7 @@ export default function OdometerStrip({ mode = "metrics" }: { mode?: "metrics" |
   const OOB_MODE = mode === "oob";
   const { env: oobEnv, root: oobRoot, irr: oobIrr } = useOOB();
 
-  const env = useEnv<EnvSlice>((s: any) => ({ leafC: s.leafC, rh: s.rh, ppfd: s.ppfd, runoffEc: s.runoffEc }));
+  const env = useEnv((s) => s.saved);
   const intake = useFrontIntake((s) => s.saved as IntakeSaved);
   const d = useDerivedNow() as { vpdKpa?: number; deltaEc?: number; };
 

@@ -87,15 +87,12 @@ export default function Cockpit() {
   return (
       <div className="cockpit-scope" style={{ display: "flex", minHeight: "100vh", paddingBottom: 80 }}>
       <main style={{ flex: 1, minWidth: 0 }}>
-        {/* Gate Odometers — system health at a glance */}
         <OdometerStrip mode="metrics" />
 
-        {/* CENTCOM Analysis — directly under odometers for quick digest */}
         <div className="card crt" style={{ width: "100%", marginTop: 12, marginBottom: 12 }}>
           <CentcomCard />
         </div>
 
-        {/* Detailed metrics: conditions, flags, and advice */}
         <PrimaryConstraintCard>
           <div className="row row-3" style={{ marginTop: 8 }}>
             <div><ConditionsPills gate="ENV" /></div>

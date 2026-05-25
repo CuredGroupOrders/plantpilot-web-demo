@@ -36,6 +36,39 @@ export default function PrimaryConstraintCard(props: {
   const [openEvidence, setOpenEvidence] = useState(!!props.defaultExpanded);
   const [openOverview, setOpenOverview] = useState(false);
 
+  const evidenceKeys = (pc as any)?.evidenceKeys as string[] | undefined;
+
+  const oob = useMemo(() => {
+    if (!snap) return { env: [], root: [], irr: [] };
+    return selectOOB(snap);
+  }, [snap]);
+
+  const gateList = useMemo(() => {
+    if (!pc) return [];
+    return pc.gate === "ENV" ? (oob.env || []) : pc.gate === "ROOT" ? (oob.root || []) : (oob.irr || []);
+  }, [pc, oob]);
+
+  const contextualEvidence = useMemo(() => {
+    if (!Array.isArray(gateList)) return [];
+    if (!Array.isArray(evidenceKeys) || !evidenceKeys.length) return gateList.slice(0, 3);
+    const filtered = gateList.filter((p: any) => !p?.key || evidenceKeys.includes(String(p.key)));
+    return (filtered.length ? filtered : gateList).slice(0, 3);
+  }, [gateList, evidenceKeys]);
+
+  const metricReadout = useMemo(() => {
+    if (!pc) return null;
+    const applied: AppliedRow[] = Array.isArray(snap?.summary?.applied) ? (snap.summary.applied as any) : [];
+    if (!applied.length) return null;
+    const keys = Array.isArray(evidenceKeys) ? evidenceKeys : [];
+    const wantGate = pc.gate;
+
+    for (const k of keys) {
+      const r = applied.find(x => String(x?.key||"") === k && String(x?.gate||"").toUpperCase() === wantGate);
+      if (r) return r;
+    }
+    return applied.find(x => String(x?.gate||"").toUpperCase() === wantGate) ?? null;
+  }, [snap, evidenceKeys, pc]);
+
   // If no engine snapshot yet, still render the shell (so UI proves it exists)
   if (!pc) {
     return (
@@ -78,39 +111,6 @@ export default function PrimaryConstraintCard(props: {
   const primaryWhy = String(match?.[1] ?? pc.why ?? "").trim() || undefined;
   const confPct = Math.round((pc.confidence || 0) * 100);
   const gcol = gateColor(pc.gate);
-
-  const evidenceKeys = (pc as any)?.evidenceKeys as string[] | undefined;
-
-  const oob = useMemo(() => {
-    if (!snap) return { env: [], root: [], irr: [] };
-    return selectOOB(snap);
-  }, [snap]);
-
-  const gateList =
-    pc.gate === "ENV" ? (oob.env || []) : pc.gate === "ROOT" ? (oob.root || []) : (oob.irr || []);
-
-  const contextualEvidence = useMemo(() => {
-    if (!Array.isArray(gateList)) return [];
-    if (!Array.isArray(evidenceKeys) || !evidenceKeys.length) return gateList.slice(0, 3);
-    const filtered = gateList.filter((p: any) => !p?.key || evidenceKeys.includes(String(p.key)));
-    return (filtered.length ? filtered : gateList).slice(0, 3);
-  }, [gateList, evidenceKeys]);
-
-  // Pull a single primary metric readout from summary.applied when possible
-  const metricReadout = useMemo(() => {
-    const applied: AppliedRow[] = Array.isArray(snap?.summary?.applied) ? (snap.summary.applied as any) : [];
-    if (!applied.length) return null;
-    const keys = Array.isArray(evidenceKeys) ? evidenceKeys : [];
-    const wantGate = pc.gate;
-
-    // Try: first evidence key, same gate
-    for (const k of keys) {
-      const r = applied.find(x => String(x?.key||"") === k && String(x?.gate||"").toUpperCase() === wantGate);
-      if (r) return r;
-    }
-    // Fallback: any row that matches gate + contains "pH" etc via label
-    return applied.find(x => String(x?.gate||"").toUpperCase() === wantGate) ?? null;
-  }, [snap, evidenceKeys, pc.gate]);
 
   const alarmBorder = "rgba(248,113,113,0.75)";
   const alarmGlow = "0 0 18px rgba(248,113,113,0.25)";
