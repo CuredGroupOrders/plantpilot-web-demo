@@ -1,4 +1,5 @@
 import * as Sheet from "../api/sheet";
+import { getLocalTargets } from "../lib/intakeLocal";
 import type { BaselineSnapshot, Top3FlagRow } from "../types/baselineSnapshot";
 import { computePrimaryConstraint } from "../state/selectors/primaryConstraint";
 import { selectOOB } from "../state/selectors/oob";
@@ -23,13 +24,10 @@ export async function submitIntakeDraft(
   opts: {
     targets: Record<string, number>;
     cfgKey: string | null;
-    report: { progress: (n: number, msg?: string) => void };
-    signal: AbortSignal;
   },
 ): Promise<void> {
-  const { targets, cfgKey, report, signal } = opts;
+  const { cfgKey } = opts;
 
-  report.progress(0.15, "Applying configuration");
   const ctx: ConfigContext = {
     stage: draft.stage || "",
     medium: draft.medium || "",
@@ -40,14 +38,9 @@ export async function submitIntakeDraft(
     profile: draft.profile ?? "SharkmouseFarms",
   };
 
-  const freshTargets = (await Sheet.applyConfig(ctx)) ?? targets;
-  if (signal.aborted) return;
-
-  report.progress(0.45, "Building payload");
+  const freshTargets = getLocalTargets(ctx);
   const eff = buildEffectivePayload(draft, freshTargets);
-  if (signal.aborted) return;
 
-  report.progress(0.65, "Writing + recalculating engine");
   const writeRes = await Sheet.evaluate(eff as any, 1);
 
   const __bs_pc = computePrimaryConstraint(writeRes as any);
@@ -149,9 +142,7 @@ export async function submitIntakeDraft(
   };
 
   useHistory.getState().attachBaselineSnapshotToLatest(__bs_snap);
-  if (signal.aborted) return;
 
-  report.progress(0.92, "Updating cockpit");
   useSheetSnap.getState().setLatestWrite(writeRes);
   useSheetSnap.getState().setLatest(writeRes);
   try {
@@ -161,13 +152,11 @@ export async function submitIntakeDraft(
   setIntake(draft);
   setLastIntake(draft);
 
-  report.progress(0.96, "IRR physics solve");
   let __irr: any = null;
   try {
     __irr = await fetchIrrSolve(draft as any);
   } catch {}
 
-  report.progress(0.97, "Reality delta");
   let __rd: any = null;
   try {
     __rd = await fetchRealityDelta(draft as any);
@@ -191,5 +180,4 @@ export async function submitIntakeDraft(
     });
   } catch {}
 
-  report.progress(1, "Done");
 }

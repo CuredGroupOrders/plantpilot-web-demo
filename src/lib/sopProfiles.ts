@@ -41,8 +41,35 @@ export function optionSetHas(
   return false;
 }
 
+/** One dropdown label per growroom suffix (SharkmouseFarms vs SharkMouseFarms → SharkmouseFarms). */
+function canonicalSopLabel(raw: string): string | null {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed || trimmed.toLowerCase() === "default") return null;
+
+  const meta = getSopProfileMeta(trimmed);
+  if (meta) return meta.key;
+
+  const suffix = sopProfileKeySuffix(trimmed);
+  for (const key of KNOWN_SOP_PROFILES) {
+    if (sopProfileKeySuffix(key) === suffix) return key;
+  }
+  return trimmed;
+}
+
 export function mergeSopProfileList(fromApi: string[] | undefined): string[] {
-  const api = (fromApi ?? []).map(String).filter(Boolean);
-  const merged = [...new Set([...api, ...KNOWN_SOP_PROFILES])];
-  return merged.filter((p) => p.toLowerCase() !== "default");
+  const seenSuffix = new Set<string>();
+  const out: string[] = [];
+
+  const add = (raw: string) => {
+    const label = canonicalSopLabel(raw);
+    if (!label) return;
+    const suffix = sopProfileKeySuffix(label);
+    if (seenSuffix.has(suffix)) return;
+    seenSuffix.add(suffix);
+    out.push(label);
+  };
+
+  for (const p of fromApi ?? []) add(String(p));
+  for (const p of KNOWN_SOP_PROFILES) add(p);
+  return out;
 }

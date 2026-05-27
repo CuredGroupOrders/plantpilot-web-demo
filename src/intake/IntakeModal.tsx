@@ -7,10 +7,9 @@ type Props = {
   onClose: () => void;
 };
 
-export default function IntakeModal({ open, onClose }: Props) {
+/** Intake session only mounts while open (avoids GAS/eval work on every page load). */
+function IntakeModalBody({ onClose }: { onClose: () => void }) {
   const session = useIntakeSession({ onSubmitted: onClose });
-
-  if (!open) return null;
 
   return (
     <div
@@ -82,4 +81,9 @@ export default function IntakeModal({ open, onClose }: Props) {
       </div>
     </div>
   );
+}
+
+export default function IntakeModal({ open, onClose }: Props) {
+  if (!open) return null;
+  return <IntakeModalBody onClose={onClose} />;
 }

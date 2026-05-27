@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import * as Sheet from "../api/sheet";
 import { loadRules, type StageProfile } from "../data/growroom-rules";
-import { useTask } from "../TaskSystems";
+import { getLocalOptions, getLocalTargets } from "../lib/intakeLocal";
 import { useSheetSnap } from "../state/sheetSnap";
 import { publishWire } from "../shared/wire";
 import IntakeWizard, { type WizardConfig } from "../IntakeWizard";
@@ -12,7 +12,6 @@ import {
   computeVPD,
   DEBOUNCE_MS,
   getLastIntake,
-  mapScoresFromPayload,
   setLastIntake,
   type ConfigContext,
   type Intake,
@@ -20,20 +19,24 @@ import {
 import { submitIntakeDraft } from "./submitIntake";
 
 export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
-  const { run } = useTask();
   const setLatest = useSheetSnap((s) => s.setLatest);
 
   const [intake, setIntake] = useState<Intake | null>(() => getLastIntake());
-  const [lists, setLists] = useState({
-    stagePhase: [] as string[],
-    medium: [] as string[],
-    containerSize: [] as string[],
-    co2Mode: [] as string[],
-    lightcycle: [] as string[],
-    photoperiodH: [] as string[],
-    sopProfile: [] as string[],
+  const [lists, setLists] = useState(() => {
+    const o = getLocalOptions();
+    return {
+      stagePhase: o.stagePhase ?? [],
+      medium: o.medium ?? [],
+      containerSize: o.containerSize ?? [],
+      co2Mode: o.co2Mode ?? [],
+      lightcycle: o.lightcycle ?? [],
+      photoperiodH: o.photoperiodH ?? [],
+      sopProfile: o.sopProfile ?? [],
+    };
   });
-  const [targets, setTargets] = useState<Record<string, number>>({});
+  const [targets, setTargets] = useState<Record<string, number>>(() =>
+    getLastIntake() ? getLocalTargets(getLastIntake()!) : {},
+  );
   const [cfgKey, setCfgKey] = useState<string | null>(null);
   const [wizardConfigApplied, setWizardConfigApplied] = useState(false);
   const [stageProfiles, setStageProfiles] = useState<StageProfile[]>([]);
@@ -45,63 +48,22 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
     loadRules().then((rules) => setStageProfiles(rules.stageProfiles));
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await run(
-          { title: "Loading", message: "Fetching options…", cancellable: false },
-          async () => {
-            await Sheet.fetchCfg();
-            const options = await Sheet.fetchOptions();
-            setLists({
-              stagePhase: options.stagePhase ?? [],
-              medium: options.medium ?? [],
-              containerSize: options.containerSize ?? [],
-              co2Mode: options.co2Mode ?? [],
-              lightcycle: options.lightcycle ?? [],
-              photoperiodH: options.photoperiodH ?? [],
-              sopProfile: options.sopProfile ?? [],
-            });
-            setTargets(await Sheet.fetchTargets());
-          },
-        );
-      } catch (e) {
-        console.warn(e);
-      }
-    })();
-  }, [run]);
-
   const applyConfig = useCallback(
-    async (ctx: ConfigContext): Promise<Record<string, number> | null> => {
+    (ctx: ConfigContext): Record<string, number> => {
       const newKey = JSON.stringify(ctx);
       if (cfgKey === newKey) return targets;
       setCfgKey(newKey);
-
-      return run(
-        {
-          title: "Updating targets",
-          message: "Syncing configuration…",
-          cancellable: false,
-        },
-        async (report, signal) => {
-          report.progress(0.2, "Applying config");
-          await Sheet.applyConfig(ctx);
-          if (signal.aborted) return targets;
-          const t = await Sheet.fetchTargets();
-          if (signal.aborted) return targets;
-          setTargets(t);
-          report.progress(1, "Done");
-          return t;
-        },
-      ).catch(() => null);
+      const t = getLocalTargets(ctx);
+      setTargets(t);
+      return t;
     },
-    [cfgKey, run, targets],
+    [cfgKey, targets],
   );
 
   const handleWizardConfigApplied = useCallback(
-    async (config: WizardConfig) => {
+    (config: WizardConfig) => {
       const base = intake ?? ({} as Intake);
-      setIntake({
+      const next: Intake = {
         ...base,
         stage: config.stage,
         medium: config.medium,
@@ -111,8 +73,9 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
         photoperiodH: config.photoperiodH,
         mode: config.mode,
         profile: config.profile,
-      } as Intake);
-      await applyConfig({
+      };
+      setIntake(next);
+      applyConfig({
         stage: config.stage,
         medium: config.medium,
         container: config.container,
@@ -162,21 +125,12 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
     async (draft: Intake) => {
       setSubmitting(true);
       try {
-        await run(
-          {
-            title: "Submit & Calculate",
-            message: "Running growroom engine…",
-            cancellable: false,
-          },
-          async (report, signal) => {
-            await submitIntakeDraft(draft, {
-              targets,
-              cfgKey,
-              report,
-              signal,
-            });
-          },
-        );
+        const freshTargets = getLocalTargets(draft);
+        setTargets(freshTargets);
+        await submitIntakeDraft(draft, {
+          targets: freshTargets,
+          cfgKey,
+        });
         setIntake(draft);
         setLastIntake(draft);
         try {
@@ -190,7 +144,7 @@ export function useIntakeSession(opts?: { onSubmitted?: () => void }) {
         setSubmitting(false);
       }
     },
-    [cfgKey, opts, run, targets],
+    [cfgKey, opts],
   );
 
   const wizard: ReactNode = !wizardConfigApplied ? (
